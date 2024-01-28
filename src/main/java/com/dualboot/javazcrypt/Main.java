@@ -14,86 +14,44 @@ import java.security.spec.KeySpec;
 
 import java.nio.charset.StandardCharsets;
 
+import java.util.Scanner;
+
 public class Main {
-
-    private static final String ALGORITHM = "AES";
-    private static final String TRANSFORMATION = "AES/ECB/PKCS5Padding";
-
-    public static void encryptFile(String inputFilePath, String outputFilePath, String password) {
-        try {
-            Key key = generateKey(password);
-            Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-            cipher.init(Cipher.ENCRYPT_MODE, key);
-
-            byte[] inputFileBytes = Files.readAllBytes(Paths.get(inputFilePath));
-            byte[] encryptedBytes = cipher.doFinal(inputFileBytes);
-
-            try (FileOutputStream outputStream = new FileOutputStream(outputFilePath)) {
-                outputStream.write(encryptedBytes);
-            }
-
-            System.out.println("File encrypted successfully.");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void decryptFile(String inputFilePath, String outputFilePath, String password) {
-        try {
-            Key key = generateKey(password);
-            Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-            cipher.init(Cipher.DECRYPT_MODE, key);
-
-            byte[] inputFileBytes = Files.readAllBytes(Paths.get(inputFilePath));
-            byte[] decryptedBytes = cipher.doFinal(inputFileBytes);
-
-            // try (FileOutputStream outputStream = new FileOutputStream(outputFilePath)) {
-            //     outputStream.write(decryptedBytes);
-            // }
-
-            String decryptedContent = new String(decryptedBytes, StandardCharsets.UTF_8);
-
-            System.out.println(decryptedContent);
-
-            System.out.println("File decrypted successfully.");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    // private static Key generateKey(String password) throws Exception {
-    //     return new SecretKeySpec(password.getBytes(), ALGORITHM);
-        
-    // }
-
-    private static Key generateKey(String password) throws Exception {
-    // Use PBKDF2 with SHA-256
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-        KeySpec spec = new PBEKeySpec(password.toCharArray(), password.getBytes(), 65536, 256);
-        SecretKey tmp = factory.generateSecret(spec);
-        return new SecretKeySpec(tmp.getEncoded(), ALGORITHM);
-    }
-
     public static void main(String[] args) {
         String inputFilePath = "file.txt";
         String encryptedFilePath = "encrypted_file.txt";
         String decryptedFilePath = "decrypted_file.txt";
-        String password = "yourSecretPassword";
-
-        // Scanner scanner = new Scanner(System.in);
-        // String password = scanner.nextLine();
+        // String password = "yourSecretPassword";
 
         if (!(args.length > 0)) {
             System.out.println("No arguments were provided."); return;
         }
         if (!(args.length >= 2)) {
-            System.out.println("Not enough arguments provived."); return;
+            System.out.println("Not enough arguments provided."); return;
         }
         if (args[0].equals("--help")) return;
 
-        if (args[0].equals("-e")) encryptFile(args[1], args[1], password);
-        if (args[0].equals("-d")) decryptFile(args[1], args[1], password);
+        Scanner scanner = new Scanner(System.in);
+        System.out.printf("Enter a password: ");
+        String password = scanner.nextLine();
+
+        if (args[0].equals("-e")) { 
+            try {
+                byte[] encryptedBytes = CryptOps.encryptFile(args[1], password);
+                ContentManager.printBytes(encryptedBytes);
+                ContentManager.writeBytesToFile(args[1],encryptedBytes);
+            } catch (Exception e) {
+                System.out.println("Error while encrypting file");
+            }
+        }
+
+        if (args[0].equals("-d")) {
+            try {
+                byte[] decryptedBytes = CryptOps.decryptFile(args[1], password);
+                ContentManager.printBytes(decryptedBytes);
+            } catch (Exception e) {
+                System.out.println("Error while decrypting file");
+            }
+        }
     }
 }
