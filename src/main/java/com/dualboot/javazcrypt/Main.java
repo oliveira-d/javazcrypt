@@ -12,6 +12,8 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.spec.KeySpec;
 
+import java.nio.charset.StandardCharsets;
+
 public class Main {
 
     private static final String ALGORITHM = "AES";
@@ -46,9 +48,13 @@ public class Main {
             byte[] inputFileBytes = Files.readAllBytes(Paths.get(inputFilePath));
             byte[] decryptedBytes = cipher.doFinal(inputFileBytes);
 
-            try (FileOutputStream outputStream = new FileOutputStream(outputFilePath)) {
-                outputStream.write(decryptedBytes);
-            }
+            // try (FileOutputStream outputStream = new FileOutputStream(outputFilePath)) {
+            //     outputStream.write(decryptedBytes);
+            // }
+
+            String decryptedContent = new String(decryptedBytes, StandardCharsets.UTF_8);
+
+            System.out.println(decryptedContent);
 
             System.out.println("File decrypted successfully.");
 
@@ -76,6 +82,9 @@ public class Main {
         String decryptedFilePath = "decrypted_file.txt";
         String password = "yourSecretPassword";
 
+        // Scanner scanner = new Scanner(System.in);
+        // String password = scanner.nextLine();
+
         if (!(args.length > 0)) {
             System.out.println("No arguments were provided."); return;
         }
@@ -84,7 +93,7 @@ public class Main {
         }
         if (args[0].equals("--help")) return;
 
-        if (args[0].equals("-e")) encryptFile(args[1], encryptedFilePath, password);
-        if (args[0].equals("-d")) decryptFile(args[1], decryptedFilePath, password);
+        if (args[0].equals("-e")) encryptFile(args[1], args[1], password);
+        if (args[0].equals("-d")) decryptFile(args[1], args[1], password);
     }
 }
