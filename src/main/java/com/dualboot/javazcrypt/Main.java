@@ -59,7 +59,7 @@ public class Main {
 
         if (operation.equals("-e") || operation.equals("--encrypt")) { 
             try {
-                byte[] encryptedBytes = CryptOps.encryptFile(inputFilePath, password);
+                byte[] encryptedBytes = CryptOps.encryptFile(inputFilePath, password, keyFile);
                 ContentManager.printBytes(encryptedBytes);
                 if (inPlace == true) ContentManager.writeBytesToFile(inputFilePath,encryptedBytes);
                 if (outputFilePath != null) ContentManager.writeBytesToFile(outputFilePath,encryptedBytes);
@@ -68,7 +68,7 @@ public class Main {
             }
         } else if (operation.equals("-d") || operation.equals("--decrypt")) {
             try {
-                byte[] decryptedBytes = CryptOps.decryptFile(inputFilePath, password);
+                byte[] decryptedBytes = CryptOps.decryptFile(inputFilePath, password,keyFile);
                 ContentManager.printBytes(decryptedBytes);
                 if (inPlace == true) ContentManager.writeBytesToFile(inputFilePath,decryptedBytes);
                 if (outputFilePath != null) ContentManager.writeBytesToFile(outputFilePath,decryptedBytes);

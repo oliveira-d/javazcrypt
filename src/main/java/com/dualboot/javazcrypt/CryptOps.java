@@ -17,9 +17,9 @@ public class CryptOps {
     private static final String ALGORITHM = "AES";
     private static final String TRANSFORMATION = "AES/ECB/PKCS5Padding";
 
-    public static byte[] encryptFile(String inputFilePath, String password) throws Exception {
+    public static byte[] encryptFile(String inputFilePath, String password, String keyFile) throws Exception {
         
-        Key key = generateKey(password);
+        Key key = generateKey(password,keyFile);
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);
         cipher.init(Cipher.ENCRYPT_MODE, key);
 
@@ -30,9 +30,9 @@ public class CryptOps {
         return encryptedBytes;
     }
 
-    public static byte[] decryptFile(String inputFilePath, String password) throws Exception {
+    public static byte[] decryptFile(String inputFilePath, String password, String keyFile) throws Exception {
         
-        Key key = generateKey(password);
+        Key key = generateKey(password,keyFile);
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);
         cipher.init(Cipher.DECRYPT_MODE, key);
 
@@ -43,10 +43,14 @@ public class CryptOps {
         return decryptedBytes;
     }
 
-    private static Key generateKey(String password) throws Exception {
+    private static Key generateKey(String password, String keyFile) throws Exception {
     // Use PBKDF2 with SHA-256
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
-        KeySpec spec = new PBEKeySpec(password.toCharArray(), password.toUpperCase().getBytes(), 65536, 256); // 256 bits is the maximum key size hehe
+        byte[] passwordSalt = password.toUpperCase().getBytes();
+        if (keyFile != null) {
+            passwordSalt = Files.readAllBytes(Paths.get(keyFile));
+        }
+        KeySpec spec = new PBEKeySpec(password.toCharArray(), passwordSalt, 65536, 256); // 256 bits is the maximum key size hehe
         SecretKey tmp = factory.generateSecret(spec);
         return new SecretKeySpec(tmp.getEncoded(), ALGORITHM);
     }
