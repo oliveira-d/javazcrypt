@@ -10,6 +10,7 @@ import java.security.spec.KeySpec;
 import java.security.Key;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class CryptOps {
@@ -48,7 +49,13 @@ public class CryptOps {
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
         byte[] passwordSalt = password.toUpperCase().getBytes();
         if (keyFile != null) {
-            passwordSalt = Files.readAllBytes(Paths.get(keyFile));
+            Path keyFilePath = Paths.get(keyFile);
+            if (Files.exists(keyFilePath) && Files.isRegularFile(keyFilePath)) {
+                passwordSalt = Files.readAllBytes(keyFilePath);
+            } else {
+                System.err.println("Could not find key file. Exiting program.");
+                System.exit(1);
+            }
         }
         KeySpec spec = new PBEKeySpec(password.toCharArray(), passwordSalt, 65536, 256); // 256 bits is the maximum key size hehe
         SecretKey tmp = factory.generateSecret(spec);
