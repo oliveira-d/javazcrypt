@@ -2,17 +2,15 @@ package com.dualboot.javazcrypt;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.Key;
-
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.spec.KeySpec;
 
-import java.nio.charset.StandardCharsets;
+import java.security.Key;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class CryptOps {
 
@@ -33,6 +31,7 @@ public class CryptOps {
     }
 
     public static byte[] decryptFile(String inputFilePath, String password) throws Exception {
+        
         Key key = generateKey(password);
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);
         cipher.init(Cipher.DECRYPT_MODE, key);
@@ -41,26 +40,15 @@ public class CryptOps {
         byte[] decryptedBytes = cipher.doFinal(inputFileBytes);
 
         System.out.println("File decrypted successfully.");
-
         return decryptedBytes;
     }
 
-    public static void printBytes(byte[] decryptedBytes) {
-        String decryptedContent = new String(decryptedBytes, StandardCharsets.UTF_8);
-        System.out.printf("%s",decryptedContent);
-    } 
-
     private static Key generateKey(String password) throws Exception {
     // Use PBKDF2 with SHA-256
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-        KeySpec spec = new PBEKeySpec(password.toCharArray(), password.getBytes(), 65536, 256);
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
+        KeySpec spec = new PBEKeySpec(password.toCharArray(), password.toUpperCase().getBytes(), 65536, 256); // 256 bits is the maximum key size hehe
         SecretKey tmp = factory.generateSecret(spec);
         return new SecretKeySpec(tmp.getEncoded(), ALGORITHM);
     }
 
-    public static void writeBytesToFile(String outputFilePath, byte[] outputBytes) throws IOException {
-        try (FileOutputStream outputStream = new FileOutputStream(outputFilePath)) {
-            outputStream.write(outputBytes);
-        }
-    }
 }

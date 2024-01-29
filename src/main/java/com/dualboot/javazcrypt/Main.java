@@ -1,57 +1,83 @@
 package com.dualboot.javazcrypt;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.Key;
-
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import java.security.spec.KeySpec;
-
-import java.nio.charset.StandardCharsets;
-
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        String inputFilePath = "file.txt";
-        String encryptedFilePath = "encrypted_file.txt";
-        String decryptedFilePath = "decrypted_file.txt";
-        // String password = "yourSecretPassword";
 
-        if (!(args.length > 0)) {
-            System.out.println("No arguments were provided."); return;
+        if (args.length == 0) {
+            System.err.println("No arguments were provided.\nDisplaying help instead:"); return;
         }
-        if (!(args.length >= 2)) {
-            System.out.println("Not enough arguments provided."); return;
+
+        if (args.length == 1) {
+            System.err.println("Not enough arguments were provided.\nDisplaying help instead:"); return;
         }
-        if (args[0].equals("--help")) return;
+        
+        String keyFile = null;
+        String operation = null;
+        String inputFilePath = null;
+        boolean inPlace = false;
+        String outputFilePath = null;
+
+        for (int i = 0; i < args.length; i++) {
+            switch (args[i]) {
+                case "-e":
+                case "-d":
+                case "--encrypt":
+                case "--decrypt":
+                    operation = args[i];
+                    break;
+                case "-k":
+                    if (i < args.length - 1) {
+                        keyFile = args[++i]; // ++i - Move to the next argument - keyfile path won't serve in switch case anyway
+                    } else {
+                        System.out.println("Missing key file.");
+                        System.exit(1);
+                    }
+                    break;
+                case "-o":
+                case "--output":
+                    if (i < args.length -1) {
+                        outputFilePath = args[++i];
+                    } else {
+                        System.err.println("Missing output file.");
+                        System.exit(1);
+                    }
+                    break;
+                case "-i":
+                case "--in-place":
+                    inPlace = true;
+                    break;
+                default:
+                    inputFilePath = args[i];
+            }
+        }
 
         Scanner scanner = new Scanner(System.in);
         System.out.printf("Enter a password: ");
         String password = scanner.nextLine();
 
-        if (args[0].equals("-e")) { 
+        if (operation.equals("-e") || operation.equals("--encrypt")) { 
             try {
-                byte[] encryptedBytes = CryptOps.encryptFile(args[1], password);
+                byte[] encryptedBytes = CryptOps.encryptFile(inputFilePath, password);
                 ContentManager.printBytes(encryptedBytes);
-                ContentManager.writeBytesToFile(args[1],encryptedBytes);
+                if (inPlace == true) ContentManager.writeBytesToFile(inputFilePath,encryptedBytes);
+                if (outputFilePath != null) ContentManager.writeBytesToFile(outputFilePath,encryptedBytes);
             } catch (Exception e) {
                 System.out.println("Error while encrypting file");
             }
-        }
-
-        if (args[0].equals("-d")) {
+        } else if (operation.equals("-d") || operation.equals("--decrypt")) {
             try {
-                byte[] decryptedBytes = CryptOps.decryptFile(args[1], password);
+                byte[] decryptedBytes = CryptOps.decryptFile(inputFilePath, password);
                 ContentManager.printBytes(decryptedBytes);
+                if (inPlace == true) ContentManager.writeBytesToFile(inputFilePath,decryptedBytes);
+                if (outputFilePath != null) ContentManager.writeBytesToFile(outputFilePath,decryptedBytes);
             } catch (Exception e) {
                 System.out.println("Error while decrypting file");
+                e.printStackTrace();
             }
+        } else {
+            System.err.println("Operation not recognized.");
         }
     }
 }
