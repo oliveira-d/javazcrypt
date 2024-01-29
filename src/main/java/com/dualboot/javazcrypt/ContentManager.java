@@ -13,8 +13,8 @@ public class ContentManager {
         System.out.printf("%s",decryptedContent);
     }
 
-    public static void writeBytesToFile(String outputFilePath, byte[] outputBytes) throws IOException {
-        try (FileOutputStream outputStream = new FileOutputStream(outputFilePath)) {
+    public static void writeBytesToFile(String outputFile, byte[] outputBytes) throws IOException {
+        try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
             outputStream.write(outputBytes);
         }
     }

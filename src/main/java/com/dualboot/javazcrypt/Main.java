@@ -15,9 +15,9 @@ public class Main {
         
         String keyFile = null;
         String operation = null;
-        String inputFilePath = null;
+        String inputFile = null;
         boolean inPlace = false;
-        String outputFilePath = null;
+        String outputFile = null;
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
@@ -38,7 +38,7 @@ public class Main {
                 case "-o":
                 case "--output":
                     if (i < args.length -1) {
-                        outputFilePath = args[++i];
+                        outputFile = args[++i];
                     } else {
                         System.err.println("Missing output file.");
                         System.exit(1);
@@ -49,7 +49,7 @@ public class Main {
                     inPlace = true;
                     break;
                 default:
-                    inputFilePath = args[i];
+                    inputFile = args[i];
             }
         }
 
@@ -59,19 +59,19 @@ public class Main {
 
         if (operation.equals("-e") || operation.equals("--encrypt")) { 
             try {
-                byte[] encryptedBytes = CryptOps.encryptFile(inputFilePath, password, keyFile);
+                byte[] encryptedBytes = CryptOps.encryptFile(inputFile, password, keyFile);
                 ContentManager.printBytes(encryptedBytes);
-                if (inPlace == true) ContentManager.writeBytesToFile(inputFilePath,encryptedBytes);
-                if (outputFilePath != null) ContentManager.writeBytesToFile(outputFilePath,encryptedBytes);
+                if (inPlace == true) ContentManager.writeBytesToFile(inputFile,encryptedBytes);
+                if (outputFile != null) ContentManager.writeBytesToFile(outputFile,encryptedBytes);
             } catch (Exception e) {
                 System.out.println("Error while encrypting file");
             }
         } else if (operation.equals("-d") || operation.equals("--decrypt")) {
             try {
-                byte[] decryptedBytes = CryptOps.decryptFile(inputFilePath, password,keyFile);
+                byte[] decryptedBytes = CryptOps.decryptFile(inputFile, password,keyFile);
                 ContentManager.printBytes(decryptedBytes);
-                if (inPlace == true) ContentManager.writeBytesToFile(inputFilePath,decryptedBytes);
-                if (outputFilePath != null) ContentManager.writeBytesToFile(outputFilePath,decryptedBytes);
+                if (inPlace == true) ContentManager.writeBytesToFile(inputFile,decryptedBytes);
+                if (outputFile != null) ContentManager.writeBytesToFile(outputFile,decryptedBytes);
             } catch (Exception e) {
                 System.out.println("Error while decrypting file");
                 e.printStackTrace();
