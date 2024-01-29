@@ -61,7 +61,8 @@ public class Main {
         char[] passwordChars = console.readPassword("Enter your password: ");
         String password = new String(passwordChars);
 
-        if (operation.equals("encrypt")) { 
+        if (operation.equals("encrypt")) {
+
             // double check password
             char[] passwordChars2 = console.readPassword("Confirm your password: ");
             String password2 = new String(passwordChars);
@@ -69,6 +70,7 @@ public class Main {
                 System.err.println("Passwords don't match. Aborting operation.");
                 System.exit(1);
             }
+
             try {
                 byte[] encryptedBytes = CryptOps.encryptFile(inputFile, password, keyFile);
                 if (inPlace == true) ContentManager.writeBytesToFile(inputFile,encryptedBytes);
@@ -76,7 +78,9 @@ public class Main {
             } catch (Exception e) {
                 System.out.println("Error while encrypting file");
             }
+
         } else if (operation.equals("decrypt")) {
+            
             try {
                 byte[] decryptedBytes = CryptOps.decryptFile(inputFile, password,keyFile);
                 if (inPlace == true) ContentManager.writeBytesToFile(inputFile,decryptedBytes);
@@ -86,6 +90,7 @@ public class Main {
                 System.out.println("Error while decrypting file");
                 e.printStackTrace();
             }
+            
         } else {
             System.err.println("Operation not recognized.");
         }
