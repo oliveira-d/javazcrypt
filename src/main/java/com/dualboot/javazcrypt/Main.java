@@ -24,10 +24,12 @@ public class Main {
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
                 case "-e":
-                case "-d":
                 case "--encrypt":
+                    operation = "encrypt";
+                    break;
+                case "-d":
                 case "--decrypt":
-                    operation = args[i];
+                    operation = "decrypt";
                     break;
                 case "-k":
                     if (i < args.length - 1) {
@@ -59,7 +61,14 @@ public class Main {
         char[] passwordChars = console.readPassword("Enter your password: ");
         String password = new String(passwordChars);
 
-        if (operation.equals("-e") || operation.equals("--encrypt")) { 
+        if (operation.equals("encrypt")) { 
+            // double check password
+            char[] passwordChars2 = console.readPassword("Confirm your password: ");
+            String password2 = new String(passwordChars);
+            if (!password2.equals(password)) {
+                System.err.println("Passwords don't match. Aborting operation.");
+                System.exit(1);
+            }
             try {
                 byte[] encryptedBytes = CryptOps.encryptFile(inputFile, password, keyFile);
                 if (inPlace == true) ContentManager.writeBytesToFile(inputFile,encryptedBytes);
@@ -67,7 +76,7 @@ public class Main {
             } catch (Exception e) {
                 System.out.println("Error while encrypting file");
             }
-        } else if (operation.equals("-d") || operation.equals("--decrypt")) {
+        } else if (operation.equals("decrypt")) {
             try {
                 byte[] decryptedBytes = CryptOps.decryptFile(inputFile, password,keyFile);
                 if (inPlace == true) ContentManager.writeBytesToFile(inputFile,decryptedBytes);
