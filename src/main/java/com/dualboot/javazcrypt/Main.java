@@ -3,6 +3,9 @@ package com.dualboot.javazcrypt;
 import java.util.Scanner;
 
 public class Main {
+
+    public static boolean inPlace = false;
+    
     public static void main(String[] args) {
 
         if (args.length == 0) {
@@ -16,7 +19,6 @@ public class Main {
         String keyFile = null;
         String operation = null;
         String inputFile = null;
-        boolean inPlace = false;
         String outputFile = null;
 
         for (int i = 0; i < args.length; i++) {
