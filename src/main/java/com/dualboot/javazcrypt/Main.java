@@ -1,6 +1,6 @@
 package com.dualboot.javazcrypt;
 
-import java.util.Scanner;
+import java.io.Console;
 
 public class Main {
 
@@ -55,14 +55,13 @@ public class Main {
             }
         }
 
-        Scanner scanner = new Scanner(System.in);
-        System.out.printf("Enter a password: ");
-        String password = scanner.nextLine();
+        Console console = System.console();
+        char[] passwordChars = console.readPassword("Enter your password: ");
+        String password = new String(passwordChars);
 
         if (operation.equals("-e") || operation.equals("--encrypt")) { 
             try {
                 byte[] encryptedBytes = CryptOps.encryptFile(inputFile, password, keyFile);
-                ContentManager.printBytes(encryptedBytes);
                 if (inPlace == true) ContentManager.writeBytesToFile(inputFile,encryptedBytes);
                 if (outputFile != null) ContentManager.writeBytesToFile(outputFile,encryptedBytes);
             } catch (Exception e) {
@@ -71,9 +70,9 @@ public class Main {
         } else if (operation.equals("-d") || operation.equals("--decrypt")) {
             try {
                 byte[] decryptedBytes = CryptOps.decryptFile(inputFile, password,keyFile);
-                ContentManager.printBytes(decryptedBytes);
                 if (inPlace == true) ContentManager.writeBytesToFile(inputFile,decryptedBytes);
                 if (outputFile != null) ContentManager.writeBytesToFile(outputFile,decryptedBytes);
+                if (inPlace == false && outputFile == null) ContentManager.printBytes(decryptedBytes);
             } catch (Exception e) {
                 System.out.println("Error while decrypting file");
                 e.printStackTrace();
