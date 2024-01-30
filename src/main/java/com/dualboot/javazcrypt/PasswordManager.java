@@ -26,13 +26,9 @@ public class PasswordManager {
         if (args.length == 0) {
             System.err.println("No arguments were provided.\nDisplaying help instead:"); return;
         }
-
-        if (args.length == 1) {
-            System.err.println("Not enough arguments were provided.\nDisplaying help instead:"); return;
-        }
         
         String keyFile = null;
-        String operation = null;
+        String operation = "open";
         String inputFile = null;
 
         for (int i = 0; i < args.length; i++) {
@@ -69,6 +65,9 @@ public class PasswordManager {
                 Document passwordDatabase = documentBuilder.newDocument();
                 Element rootElement = passwordDatabase.createElement("root");
                 passwordDatabase.appendChild(rootElement);
+                Element element = passwordDatabase.createElement("element");
+                element.appendChild(passwordDatabase.createTextNode("Value"));
+                rootElement.appendChild(element);
 
                 passwordChars = console.readPassword("Enter a password to encrypt the file: ");
                 password = new String(passwordChars);
@@ -90,6 +89,7 @@ public class PasswordManager {
                 byte[] decryptedBytes = CryptOps.decryptFile(inputFile, password,keyFile);
                 Document passwordDatabase = convertByteArrayToXMLDocument(decryptedBytes);
                 System.out.println("Database opened successfuly.");
+                ContentManager.printBytes(decryptedBytes);
         } catch (Exception e) {
             System.out.println("Error opening database");
         }
