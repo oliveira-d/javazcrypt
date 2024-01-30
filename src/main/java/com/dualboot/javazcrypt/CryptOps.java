@@ -37,6 +37,14 @@ public class CryptOps {
         return encryptedBytes;
     }
 
+    public static byte[] encryptBytes(byte[] inputFileBytes, String password, String keyFile) throws Exception {
+        Key key = generateKey(password,keyFile);
+        Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        byte[] encryptedBytes = cipher.doFinal(inputFileBytes);
+        return encryptedBytes;
+    }
+
     public static byte[] decryptFile(String inputFile, String password, String keyFile) throws Exception {
         
         Path inputFilePath = Paths.get(inputFile);
