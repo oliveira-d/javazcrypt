@@ -9,11 +9,54 @@ import java.nio.charset.StandardCharsets;
 
 import java.util.Scanner;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
+
 public class ContentManager {
+
+    private static String[] entryFields = {"user","password","URL","TOTP"};
 
     public static void printBytes(byte[] decryptedBytes) {
         String decryptedContent = new String(decryptedBytes, StandardCharsets.UTF_8);
         System.out.printf("%s",decryptedContent);
+    }
+
+    public static void createFolder(Document passwordDataBase, Element folder, String newFolderName) {
+        if (!folder.getTagName().equals("dir")){
+            System.err.println("Failed to create folder inside"+folder.getAttribute("name")+". "+folder.getAttribute("name")+" is not a folder.");
+            return;
+        }
+        Element newFolder = passwordDataBase.createElement("dir");
+        newFolder.setAttribute("name",newFolderName);
+        folder.appendChild(newFolder);
+    }
+
+    public static void createEntry(Document passwordDataBase, Element folder, String newEntryName) {
+        if (!folder.getTagName().equals("dir")){
+            System.err.println("Failed to create folder inside"+folder.getAttribute("name")+". "+folder.getAttribute("name")+" is not a folder.");
+            return;
+        }
+        Element newEntry = passwordDataBase.createElement("dir");
+        newEntry.setAttribute("name",newEntryName);
+        folder.appendChild(newEntry);
+        for (int i=0; i<entryFields.length; i++) {
+            Element newField = passwordDataBase.createElement("field");
+            newField.setAttribute("name",entryFields[i]);
+            newEntry.appendChild(newField);            
+        }
     }
 
     public static void writeBytesToFile(String outputFile, byte[] outputBytes) throws IOException {

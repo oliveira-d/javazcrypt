@@ -10,7 +10,6 @@ import java.security.spec.KeySpec;
 import java.security.Key;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class CryptOps {
@@ -20,12 +19,6 @@ public class CryptOps {
 
     public static byte[] encryptFile(String inputFile, String password, String keyFile) throws Exception {
         
-        Path inputFilePath = Paths.get(inputFile);
-        if (!Files.exists(inputFilePath) || !Files.isRegularFile(inputFilePath)) {
-            System.err.println("Could not find input file "+inputFile);
-            System.exit(1);
-        }
-
         Key key = generateKey(password,keyFile);
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);
         cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -46,13 +39,6 @@ public class CryptOps {
     }
 
     public static byte[] decryptFile(String inputFile, String password, String keyFile) throws Exception {
-        
-        Path inputFilePath = Paths.get(inputFile);
-        if (!Files.exists(inputFilePath) || !Files.isRegularFile(inputFilePath)) {
-            System.err.println("Could not find input file "+inputFile);
-            System.exit(1);
-        }
-
         Key key = generateKey(password,keyFile);
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);
         cipher.init(Cipher.DECRYPT_MODE, key);
@@ -67,16 +53,11 @@ public class CryptOps {
     private static Key generateKey(String password, String keyFile) throws Exception {
     // Use PBKDF2 with SHA-256
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
-        byte[] passwordSalt = password.toUpperCase().getBytes();
+        byte[] passwordSalt = null;
         if (keyFile != null) {
-            
-            Path keyFilePath = Paths.get(keyFile);
-            if (Files.exists(keyFilePath) && Files.isRegularFile(keyFilePath)) {
-                passwordSalt = Files.readAllBytes(keyFilePath);
-            } else {
-                System.err.printf("Could not find key file %s%nExiting program.%n",keyFile);
-                System.exit(1);
-            }
+            passwordSalt = password.toUpperCase().getBytes();
+        } else {
+            passwordSalt = Files.readAllBytes(Paths.get(keyFile));
         }
         KeySpec spec = new PBEKeySpec(password.toCharArray(), passwordSalt, 65536, 256); // 256 bits is the maximum key size hehe
         SecretKey tmp = factory.generateSecret(spec);

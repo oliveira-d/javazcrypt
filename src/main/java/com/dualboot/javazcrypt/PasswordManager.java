@@ -3,6 +3,11 @@ package com.dualboot.javazcrypt;
 import java.io.Console;
 import java.util.Scanner;
 
+// file checking
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 // dont know which ones are needed
 import java.io.File;
 import java.io.FileWriter;
@@ -52,6 +57,25 @@ public class PasswordManager {
                     }
                 default:
                     inputFile = args[i];
+            }
+        }
+
+        if (inputFile == null) {
+            System.err.println("No database specified.");
+            System.exit(1);
+        } else {
+            Path inputFilePath = Paths.get(inputFile);
+            if (!Files.exists(inputFilePath) || !Files.isRegularFile(inputFilePath)) {
+                System.err.printf("Could not find database %s%n Exiting.%n",inputFile);
+                System.exit(1);
+            }
+        }
+
+        if (keyFile != null) {
+            Path keyFilePath = Paths.get(keyFile);
+            if (!Files.exists(keyFilePath) || !Files.isRegularFile(keyFilePath)) {
+                System.err.printf("Could not find key file %s%nExiting.%n",keyFile);
+                System.exit(1);
             }
         }
 
