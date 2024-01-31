@@ -1,6 +1,7 @@
 package com.dualboot.javazcrypt;
 
 import java.io.Console;
+import java.util.Scanner;
 
 // dont know which ones are needed
 import java.io.File;
@@ -57,21 +58,26 @@ public class PasswordManager {
         Console console = System.console();
         char[] passwordChars = null;
         String password = null;
+        String password2 = null;
 
         if (operation.equals("create")) {
             try {
                 DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
                 Document passwordDatabase = documentBuilder.newDocument();
+                // PasswordDatabase passwordDataBase = new PasswordDatabase(documentBuilder.newDocument());
                 Element rootElement = passwordDatabase.createElement("root");
                 passwordDatabase.appendChild(rootElement);
                 Element element = passwordDatabase.createElement("element");
                 element.appendChild(passwordDatabase.createTextNode("Value"));
                 rootElement.appendChild(element);
-
-                passwordChars = console.readPassword("Enter a password to encrypt the file: ");
-                password = new String(passwordChars);
-
+                do {
+                    passwordChars = console.readPassword("Enter a password to encrypt the file: ");
+                    password = new String(passwordChars);
+                    passwordChars = console.readPassword("Confirm your password: ");
+                    password2 = new String(passwordChars);
+                    if (!password2.equals(password)) System.out.println("Passwords do not match. Try again.");
+                } while (!password2.equals(password));
                 byte[] decryptedBytes = convertXMLDocumentToByteArray(passwordDatabase);
                 byte[] encryptedBytes = CryptOps.encryptBytes(decryptedBytes,password,keyFile);
                 ContentManager.writeBytesToFile(inputFile,encryptedBytes);
@@ -86,17 +92,25 @@ public class PasswordManager {
         }
 
         try {
-                byte[] decryptedBytes = CryptOps.decryptFile(inputFile, password,keyFile);
-                Document passwordDatabase = convertByteArrayToXMLDocument(decryptedBytes);
-                System.out.println("Database opened successfuly.");
-                ContentManager.printBytes(decryptedBytes);
+            byte[] decryptedBytes = CryptOps.decryptFile(inputFile, password,keyFile);
+            Document passwordDatabase = convertByteArrayToXMLDocument(decryptedBytes);
+            System.out.println("Database opened successfuly.");
+            // ContentManager.printBytes(decryptedBytes);
         } catch (Exception e) {
             System.out.println("Error opening database");
         }
         // menu here
+        String input;
+        do {
+            System.out.println("ls -l ");
+            System.out.println("-");
+            // List folders and items here
+            System.out.println("-");
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Enter the chosen option: ");
+            input = scanner.nextLine();
 
-
-        
+        } while (!input.equals("e"));
 
         // if (operation.equals("encrypt")) {
 
