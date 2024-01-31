@@ -22,6 +22,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
 
@@ -72,6 +74,37 @@ public class ContentManager {
     public static void writeBytesToFile(String outputFile, byte[] outputBytes) throws IOException {
         try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
             outputStream.write(outputBytes);
+        }
+    }
+
+    public static void listChildElements(Element folder) {
+        // System.out.println("Child elements of " + parentElement.getTagName() + ":");
+        NodeList childNodes = folder.getChildNodes();
+
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node node = childNodes.item(i);
+
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element childElement = (Element) node;
+                String elementType = null;
+                // if (childElement.getTagName().equals("dir")) {
+                //     elementType = "dir";
+                // } else if (childElement.getTagName().equals("entry")) {
+                //     element
+                // }
+                switch (childElement.getTagName()) {
+                    case "dir":
+                        elementType = "dir";
+                        break;
+                    case "entry":
+                        elementType = "entry";
+                        break;
+                    case "field":
+                        elementType = "field";
+                }
+                System.out.println(elementType+" - "+i+" - "+childElement.getAttribute("name"));
+                // System.out.printf("%s - %d) %s",elementType,i,childElement.getAttribute("name"));
+            }
         }
     }
 }
