@@ -34,29 +34,39 @@ public class ContentManager {
         System.out.printf("%s",decryptedContent);
     }
 
-    public static void createFolder(Document passwordDataBase, Element folder, String newFolderName) {
+    public static Element createFolder(Document passwordDataBase, Element folder, String newFolderName) {
         if (!folder.getTagName().equals("dir")){
             System.err.println("Failed to create folder inside"+folder.getAttribute("name")+". "+folder.getAttribute("name")+" is not a folder.");
-            return;
+            return folder;
         }
         Element newFolder = passwordDataBase.createElement("dir");
         newFolder.setAttribute("name",newFolderName);
         folder.appendChild(newFolder);
+        return newFolder;
     }
 
-    public static void createEntry(Document passwordDataBase, Element folder, String newEntryName) {
+    public static Element createEntry(Document passwordDatabase, Element folder, String newEntryName) {
         if (!folder.getTagName().equals("dir")){
             System.err.println("Failed to create folder inside"+folder.getAttribute("name")+". "+folder.getAttribute("name")+" is not a folder.");
-            return;
+            return folder;
         }
-        Element newEntry = passwordDataBase.createElement("dir");
+        Element newEntry = passwordDatabase.createElement("entry");
         newEntry.setAttribute("name",newEntryName);
         folder.appendChild(newEntry);
         for (int i=0; i<entryFields.length; i++) {
-            Element newField = passwordDataBase.createElement("field");
+            Element newField = passwordDatabase.createElement("field");
             newField.setAttribute("name",entryFields[i]);
             newEntry.appendChild(newField);            
         }
+        return newEntry;
+    }
+
+    public static void inputText(Document passwordDataBase, Element field, String newText) {
+        if (!field.getTagName().equals("field")) {
+            System.err.println("Failed to write to field. "+field.getAttribute("name")+" is note an input field.");
+            return;
+        }
+        field.appendChild(passwordDataBase.createTextNode(newText));
     }
 
     public static void writeBytesToFile(String outputFile, byte[] outputBytes) throws IOException {

@@ -26,13 +26,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
 
 public class PasswordManager {
-    
+
     public static void main(String[] args) {
 
         if (args.length == 0) {
             System.err.println("No arguments were provided.\nDisplaying help instead:"); return;
         }
-        
+
         String keyFile = null;
         String operation = "open";
         String inputFile = null;
@@ -90,11 +90,15 @@ public class PasswordManager {
                 DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
                 Document passwordDatabase = documentBuilder.newDocument();
                 // PasswordDatabase passwordDataBase = new PasswordDatabase(documentBuilder.newDocument());
-                Element rootElement = passwordDatabase.createElement("root");
+                Element rootElement = passwordDatabase.createElement("dir");
+                rootElement.setAttribute("name","rootFolder");
                 passwordDatabase.appendChild(rootElement);
-                Element element = passwordDatabase.createElement("element");
-                element.appendChild(passwordDatabase.createTextNode("Value"));
-                rootElement.appendChild(element);
+                // Element element = passwordDatabase.createElement("personal");
+                // element.appendChild(passwordDatabase.createTextNode("Value"));
+                // rootElement.
+                // rootElement.appendChild(element);
+                Element newFolder = ContentManager.createFolder(passwordDatabase,rootElement,"personal");
+                Element newEntry = ContentManager.createEntry(passwordDatabase,newFolder,"outlook");
                 do {
                     passwordChars = console.readPassword("Enter a password to encrypt the file: ");
                     password = new String(passwordChars);
@@ -103,16 +107,17 @@ public class PasswordManager {
                     if (!password2.equals(password)) System.out.println("Passwords do not match. Try again.");
                 } while (!password2.equals(password));
                 byte[] decryptedBytes = convertXMLDocumentToByteArray(passwordDatabase);
+                ContentManager.writeBytesToFile(inputFile,decryptedBytes);
                 byte[] encryptedBytes = CryptOps.encryptBytes(decryptedBytes,password,keyFile);
                 ContentManager.writeBytesToFile(inputFile,encryptedBytes);
             } catch(Exception e) {
                 System.err.println("Error creating database.");
                 System.exit(1);
             }
-            
+
         } else {
             passwordChars = console.readPassword("Enter your password: ");
-            password = new String(passwordChars);            
+            password = new String(passwordChars);
         }
 
         try {
@@ -155,9 +160,9 @@ public class PasswordManager {
         //     }
 
         // } else if (operation.equals("decrypt")) {
-            
-            
-            
+
+
+
         // } else {
         //     System.err.println("Operation not recognized.");
         // }
