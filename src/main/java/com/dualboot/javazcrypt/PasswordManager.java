@@ -63,7 +63,7 @@ public class PasswordManager {
         if (inputFile == null) {
             System.err.println("No database specified.");
             System.exit(1);
-        } else {
+        } else if (!operation.equals("create")) {
             Path inputFilePath = Paths.get(inputFile);
             if (!Files.exists(inputFilePath) || !Files.isRegularFile(inputFilePath)) {
                 System.err.printf("Could not find database %s%n Exiting.%n",inputFile);
@@ -107,11 +107,12 @@ public class PasswordManager {
                     if (!password2.equals(password)) System.out.println("Passwords do not match. Try again.");
                 } while (!password2.equals(password));
                 byte[] decryptedBytes = convertXMLDocumentToByteArray(passwordDatabase);
-                ContentManager.writeBytesToFile(inputFile,decryptedBytes);
+                ContentManager.writeBytesToFile(inputFile+"decrypted",decryptedBytes);
                 byte[] encryptedBytes = CryptOps.encryptBytes(decryptedBytes,password,keyFile);
                 ContentManager.writeBytesToFile(inputFile,encryptedBytes);
             } catch(Exception e) {
                 System.err.println("Error creating database.");
+                e.printStackTrace();
                 System.exit(1);
             }
 

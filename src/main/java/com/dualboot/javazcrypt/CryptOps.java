@@ -54,7 +54,7 @@ public class CryptOps {
     // Use PBKDF2 with SHA-256
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
         byte[] passwordSalt = null;
-        if (keyFile != null) {
+        if (keyFile == null) {
             passwordSalt = password.toUpperCase().getBytes();
         } else {
             passwordSalt = Files.readAllBytes(Paths.get(keyFile));
