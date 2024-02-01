@@ -89,7 +89,7 @@ public class Main {
                 DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
                 Document passwordDatabase = documentBuilder.newDocument();
-                Element rootElement = passwordDatabase.createElement("dir");
+                Element rootElement = passwordDatabase.createElement("-dir-");
                 rootElement.setAttribute("name","rootFolder");
                 passwordDatabase.appendChild(rootElement);
                 do {
@@ -141,7 +141,7 @@ public class Main {
             int intInput = items; // intentionally set intInput = items so that the last line in this do-while just does not execute in case there's an exception when converting string to int
             switch (input) {
                 case "c":
-                    if (currentElement.getTagName().equals("dir")) {
+                    if (currentElement.getTagName().equals("-dir-")) {
                         System.out.printf("Enter directory name: ");
                         String folderName = scanner.nextLine();
                         ContentManager.createFolder(passwordDatabase,currentElement,folderName);
@@ -150,7 +150,7 @@ public class Main {
                     }
                     break;
                 case "e":
-                    if (currentElement.getTagName().equals("dir")) {
+                    if (currentElement.getTagName().equals("-dir-")) {
                         System.out.printf("Enter directory name: ");
                         String entryName = scanner.nextLine();
                         ContentManager.createEntry(passwordDatabase,currentElement,entryName);
