@@ -133,6 +133,18 @@ public class ContentManager {
         return newEntry;
     }
 
+    public static void deleteItem(Document document, Element folder, int index) {
+        if (!folder.getTagName().equals("-dir-")){
+            System.err.println("Failed to create item inside"+folder.getAttribute("name")+". "+folder.getAttribute("name")+" is not a folder.");
+        }
+        NodeList childNodes = folder.getChildNodes();
+        Node childNode = childNodes.item(index);
+        Element childElement = null;
+        if (childNode.getNodeType() == Node.ELEMENT_NODE) childElement = (Element) childNode;
+        folder.removeChild(childElement);
+    }
+
+
     public static void inputText(Document passwordDataBase, Element field, String newText) {
         if (!field.getTagName().equals("field")) {
             System.err.println("Failed to write to field. "+field.getAttribute("name")+" is note an input field.");

@@ -134,7 +134,7 @@ public class Main {
             System.out.println("ls -l");
             int items = ContentManager.listChildElements(currentElement);
 
-            System.out.println("c - create directory | e - create entry | f - edit entry field | q - quit | number - select directory or entry | .. - cd ..");
+            System.out.println("c - create directory | e - create entry | f - edit entry field | d - delete item | q - quit | number - select directory or entry | .. - cd ..");
             System.out.printf("Enter the chosen option: ");
             input = scanner.nextLine();
 
@@ -158,6 +158,19 @@ public class Main {
                         System.out.printf("Cannot create entry.%n%s is not a folder.",currentElement.getAttribute("name"));
                     }
                     break;
+                case "d":
+                    if (currentElement.getTagName().equals("-dir-")) {
+                        System.out.printf("Enter index to delete: ");
+                        String index = scanner.nextLine();
+                        try {
+                            int intIndex = Integer.parseInt(index);
+                            ContentManager.deleteItem(passwordDatabase,currentElement,intIndex);
+                        } catch (NumberFormatException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        System.out.printf("Cannot create entry.%n%s is not a folder.",currentElement.getAttribute("name"));
+                    }
                 case "q":
                     break;
                 default:
