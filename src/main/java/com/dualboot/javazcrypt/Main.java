@@ -3,6 +3,9 @@ package com.dualboot.javazcrypt;
 import java.io.Console;
 import java.util.Scanner;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 // file checking
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -130,9 +133,15 @@ public class Main {
         String input;
         Element currentElement = passwordDatabase.getDocumentElement(); // gets the root element
         Scanner scanner = new Scanner(System.in);
+        LinkedList<String> pathL = new LinkedList<>();
+        Queue<String> pathQ = pathL; 
         do {
-            // System.out.println("ls -l ");
-            System.out.println("ls -l "+currentElement.getAttribute("name"));
+            System.out.printf("Path: /");
+            for (int i=0; i<pathQ.size(); i++){
+                System.out.printf("%s/",pathL.get(i));
+            }
+            System.out.println();
+
             int items = ContentManager.listChildElements(currentElement);
 
             System.out.println("c - create directory | e - create entry | f - edit entry field | d - delete item | w - write to file | q - quit | number - select directory or entry | .. - cd ..");
@@ -180,6 +189,7 @@ public class Main {
                         Node parentNode = currentElement.getParentNode();
                         if (parentNode != null && parentNode.getNodeType() == Node.ELEMENT_NODE) {
                         currentElement = (Element) parentNode;
+                        pathQ.remove();
                         }
                     }
                     break;
@@ -200,7 +210,10 @@ public class Main {
                         e.printStackTrace();
                     }
             }
-            if (intInput < items) currentElement = ContentManager.getChildElement(currentElement,intInput);
+            if (intInput < items) {
+                currentElement = ContentManager.getChildElement(currentElement,intInput);
+                pathQ.add(currentElement.getAttribute("name"));
+            }
             clearScreen();
         } while (!input.equals("q"));
 
