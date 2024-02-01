@@ -49,14 +49,14 @@ public class ContentManager {
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element childElement = (Element) node;
                 String elementType = null;
-                // if (childElement.getTagName().equals("-dir-")) {
-                //     elementType = "-dir-";
+                // if (childElement.getTagName().equals("dir")) {
+                //     elementType = "dir";
                 // } else if (childElement.getTagName().equals("entry")) {
                 //     element
                 // }
                 switch (childElement.getTagName()) {
-                    case "-dir-":
-                        elementType = "-dir-";
+                    case "dir":
+                        elementType = "dir";
                         break;
                     case "entry":
                         elementType = "entry";
@@ -107,18 +107,18 @@ public class ContentManager {
     }
 
     public static Element createFolder(Document passwordDataBase, Element folder, String newFolderName) {
-        if (!folder.getTagName().equals("-dir-")){
+        if (!folder.getTagName().equals("dir")){
             System.err.println("Failed to create folder inside"+folder.getAttribute("name")+". "+folder.getAttribute("name")+" is not a folder.");
             return folder;
         }
-        Element newFolder = passwordDataBase.createElement("-dir-");
+        Element newFolder = passwordDataBase.createElement("dir");
         newFolder.setAttribute("name",newFolderName);
         folder.appendChild(newFolder);
         return newFolder;
     }
 
     public static Element createEntry(Document passwordDatabase, Element folder, String newEntryName) {
-        if (!folder.getTagName().equals("-dir-")){
+        if (!folder.getTagName().equals("dir")){
             System.err.println("Failed to create folder inside"+folder.getAttribute("name")+". "+folder.getAttribute("name")+" is not a folder.");
             return folder;
         }
@@ -134,7 +134,7 @@ public class ContentManager {
     }
 
     public static void deleteItem(Document document, Element folder, int index) {
-        if (!folder.getTagName().equals("-dir-")){
+        if (!folder.getTagName().equals("dir")){
             System.err.println("Failed to create item inside"+folder.getAttribute("name")+". "+folder.getAttribute("name")+" is not a folder.");
         }
         NodeList childNodes = folder.getChildNodes();

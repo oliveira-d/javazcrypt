@@ -90,8 +90,8 @@ public class Main {
                 DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
                 Document passwordDatabase = documentBuilder.newDocument();
-                Element rootElement = passwordDatabase.createElement("-dir-");
-                rootElement.setAttribute("name","rootFolder");
+                Element rootElement = passwordDatabase.createElement("dir");
+                rootElement.setAttribute("name","root");
                 passwordDatabase.appendChild(rootElement);
                 do {
                     passwordChars = console.readPassword("Enter a password to encrypt the file: ");
@@ -135,14 +135,14 @@ public class Main {
             System.out.println("ls -l "+currentElement.getAttribute("name"));
             int items = ContentManager.listChildElements(currentElement);
 
-            System.out.println("c - create directory | e - create entry | f - edit entry field | d - delete item | q - quit | number - select directory or entry | .. - cd ..");
+            System.out.println("c - create directory | e - create entry | f - edit entry field | d - delete item | w - write to file | q - quit | number - select directory or entry | .. - cd ..");
             System.out.printf("Enter the chosen option: ");
             input = scanner.nextLine();
 
             int intInput = items; // intentionally set intInput = items so that the last line in this do-while just does not execute in case there's an exception when converting string to int
             switch (input) {
                 case "c":
-                    if (currentElement.getTagName().equals("-dir-")) {
+                    if (currentElement.getTagName().equals("dir")) {
                         System.out.printf("Enter directory name: ");
                         String folderName = scanner.nextLine();
                         ContentManager.createFolder(passwordDatabase,currentElement,folderName);
@@ -151,7 +151,7 @@ public class Main {
                     }
                     break;
                 case "e":
-                    if (currentElement.getTagName().equals("-dir-")) {
+                    if (currentElement.getTagName().equals("dir")) {
                         System.out.printf("Enter directory name: ");
                         String entryName = scanner.nextLine();
                         ContentManager.createEntry(passwordDatabase,currentElement,entryName);
@@ -160,7 +160,7 @@ public class Main {
                     }
                     break;
                 case "d":
-                    if (currentElement.getTagName().equals("-dir-")) {
+                    if (currentElement.getTagName().equals("dir")) {
                         System.out.printf("Enter index to delete: ");
                         String index = scanner.nextLine();
                         try {
@@ -176,13 +176,23 @@ public class Main {
                 case "q":
                     break;
                 case "..":
-                    if (!currentElement.getTagName().equals("-dir-") || !currentElement.getAttribute("name").equals("root")) {
+                    if (!currentElement.getTagName().equals("dir") || !currentElement.getAttribute("name").equals("root")) {
                         Node parentNode = currentElement.getParentNode();
                         if (parentNode != null && parentNode.getNodeType() == Node.ELEMENT_NODE) {
                         currentElement = (Element) parentNode;
                         }
                     }
                     break;
+                case "w":
+                    try {
+                    byte[] decryptedBytes = ContentManager.convertXMLDocumentToByteArray(passwordDatabase);
+                    byte[] encryptedBytes = CryptOps.encryptBytes(decryptedBytes,password,keyFile);
+                    ContentManager.writeBytesToFile(inputFile,encryptedBytes);
+                    System.out.println("Content successfully written to file!");
+                    } catch (Exception e) {
+                        System.err.println("Could not write content to file.");
+                        e.printStackTrace();
+                    }
                 default:
                     try {
                         intInput = Integer.parseInt(input);
