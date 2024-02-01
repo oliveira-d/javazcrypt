@@ -134,20 +134,23 @@ public class Main {
         Element currentElement = passwordDatabase.getDocumentElement(); // gets the root element
         Scanner scanner = new Scanner(System.in);
         LinkedList<String> pathL = new LinkedList<>();
-        Queue<String> pathQ = pathL; 
+        Queue<String> pathQ = pathL;
+
+        // main interaction with database
         do {
+            // display path
             System.out.printf("Path: /");
             for (int i=0; i<pathQ.size(); i++){
                 System.out.printf("%s/",pathL.get(i));
             }
             System.out.println();
 
+            //display main menu
             int items = ContentManager.listChildElements(currentElement);
-
             System.out.println("c - create directory | e - create entry | f - edit entry field | d - delete item | w - write to file | q - quit | number - select directory or entry | .. - cd ..");
             System.out.printf("Enter the chosen option: ");
+            // get input and make decisions
             input = scanner.nextLine();
-
             int intInput = items; // intentionally set intInput = items so that the last line in this do-while just does not execute in case there's an exception when converting string to int
             switch (input) {
                 case "c":
