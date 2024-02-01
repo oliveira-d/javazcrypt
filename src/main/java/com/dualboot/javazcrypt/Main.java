@@ -89,16 +89,9 @@ public class Main {
                 DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
                 Document passwordDatabase = documentBuilder.newDocument();
-                // PasswordDatabase passwordDataBase = new PasswordDatabase(documentBuilder.newDocument());
                 Element rootElement = passwordDatabase.createElement("dir");
                 rootElement.setAttribute("name","rootFolder");
                 passwordDatabase.appendChild(rootElement);
-                // Element element = passwordDatabase.createElement("personal");
-                // element.appendChild(passwordDatabase.createTextNode("Value"));
-                // rootElement.
-                // rootElement.appendChild(element);
-                Element newFolder = ContentManager.createFolder(passwordDatabase,rootElement,"personal");
-                Element newEntry = ContentManager.createEntry(passwordDatabase,newFolder,"outlook");
                 do {
                     passwordChars = console.readPassword("Enter a password to encrypt the file: ");
                     password = new String(passwordChars);
@@ -106,7 +99,7 @@ public class Main {
                     password2 = new String(passwordChars);
                     if (!password2.equals(password)) System.out.println("Passwords do not match. Try again.");
                 } while (!password2.equals(password));
-                byte[] decryptedBytes = convertXMLDocumentToByteArray(passwordDatabase);
+                byte[] decryptedBytes = ContentManager.convertXMLDocumentToByteArray(passwordDatabase);
                 ContentManager.writeBytesToFile(inputFile+"decrypted",decryptedBytes);
                 byte[] encryptedBytes = CryptOps.encryptBytes(decryptedBytes,password,keyFile);
                 ContentManager.writeBytesToFile(inputFile,encryptedBytes);
@@ -121,26 +114,62 @@ public class Main {
             password = new String(passwordChars);
         }
 
+        Document passwordDatabase = null; // initialize so that I can use in the menu
         try {
             byte[] decryptedBytes = CryptOps.decryptFile(inputFile, password,keyFile);
-            Document passwordDatabase = convertByteArrayToXMLDocument(decryptedBytes);
+            passwordDatabase = ContentManager.convertByteArrayToXMLDocument(decryptedBytes);
             System.out.println("Database opened successfuly.");
             // ContentManager.printBytes(decryptedBytes);
         } catch (Exception e) {
             System.out.println("Error opening database");
+            System.exit(1);
         }
+        clearScreen();
         // menu here
         String input;
+        Element currentElement = passwordDatabase.getDocumentElement(); // gets the root element
+        Scanner scanner = new Scanner(System.in);
         do {
-            System.out.println("ls -l ");
-            System.out.println("-");
-            // List folders and items here
-            System.out.println("-");
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("Enter the chosen option: ");
+            // System.out.println("ls -l ");
+            System.out.println("ls -l");
+            int items = ContentManager.listChildElements(currentElement);
+
+            System.out.println("c - create directory | e - create entry | f - edit entry field | q - quit | number - select directory or entry | .. - cd ..");
+            System.out.printf("Enter the chosen option: ");
             input = scanner.nextLine();
 
-        } while (!input.equals("e"));
+            int intInput = items; // intentionally set intInput = items so that the last line in this do-while just does not execute in case there's an exception when converting string to int
+            switch (input) {
+                case "c":
+                    if (currentElement.getTagName().equals("dir")) {
+                        System.out.printf("Enter directory name: ");
+                        String folderName = scanner.nextLine();
+                        ContentManager.createFolder(passwordDatabase,currentElement,folderName);
+                    } else {
+                        System.out.printf("Cannot create directory.%n%s is not a folder.",currentElement.getAttribute("name"));
+                    }
+                    break;
+                case "e":
+                    if (currentElement.getTagName().equals("dir")) {
+                        System.out.printf("Enter directory name: ");
+                        String entryName = scanner.nextLine();
+                        ContentManager.createEntry(passwordDatabase,currentElement,entryName);
+                    } else {
+                        System.out.printf("Cannot create entry.%n%s is not a folder.",currentElement.getAttribute("name"));
+                    }
+                    break;
+                case "q":
+                    break;
+                default:
+                    try {
+                        intInput = Integer.parseInt(input);
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
+            }
+            if (intInput < items) currentElement = ContentManager.getChildElement(currentElement,intInput);
+            clearScreen();
+        } while (!input.equals("q"));
 
         // if (operation.equals("encrypt")) {
 
@@ -169,22 +198,9 @@ public class Main {
         // }
     }
 
-    private static byte[] convertXMLDocumentToByteArray(Document xmlDocument) throws Exception {
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-
-        // Transform the XML document into a byte array
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        transformer.transform(new DOMSource(xmlDocument), new StreamResult(outputStream));
-
-        return outputStream.toByteArray();
-    }
-
-    private static Document convertByteArrayToXMLDocument(byte[] byteArray) throws Exception {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(byteArray);
-
-        return builder.parse(inputStream);
+    private static void clearScreen() {
+        // ANSI escape code to clear the screen
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
     }
 }

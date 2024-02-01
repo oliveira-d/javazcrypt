@@ -29,11 +29,81 @@ import java.io.ByteArrayInputStream;
 
 public class ContentManager {
 
-    private static String[] entryFields = {"user","password","URL","TOTP"};
+    private static String[] entryFields = {"user","password","URL","TOTP","notes"};
+
+    public static void writeBytesToFile(String outputFile, byte[] outputBytes) throws IOException {
+        try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
+            outputStream.write(outputBytes);
+        }
+    }
+
+    // methods to list stuff
+
+    public static int listChildElements(Element folder) {
+        // System.out.println("Child elements of " + parentElement.getTagName() + ":");
+        NodeList childNodes = folder.getChildNodes();
+
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node node = childNodes.item(i);
+
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element childElement = (Element) node;
+                String elementType = null;
+                // if (childElement.getTagName().equals("dir")) {
+                //     elementType = "dir";
+                // } else if (childElement.getTagName().equals("entry")) {
+                //     element
+                // }
+                switch (childElement.getTagName()) {
+                    case "dir":
+                        elementType = "dir";
+                        break;
+                    case "entry":
+                        elementType = "entry";
+                        break;
+                    case "field":
+                        elementType = "field";
+                }
+                System.out.println(elementType+" - "+i+" - "+childElement.getAttribute("name"));
+                // System.out.printf("%s - %d) %s",elementType,i,childElement.getAttribute("name"));
+            }
+        }
+        return childNodes.getLength();
+    }
+    
+    public static Element getChildElement(Element folder, int index) {
+            // System.out.println("Child elements of " + parentElement.getTagName() + ":");
+        NodeList childNodes = folder.getChildNodes();
+        Node node = childNodes.item(index);
+        Element childElement = null;
+        if (node.getNodeType() == Node.ELEMENT_NODE) childElement = (Element) node;
+        return childElement;
+    }
+
+    //methods to manage XML file in memory
 
     public static void printBytes(byte[] decryptedBytes) {
         String decryptedContent = new String(decryptedBytes, StandardCharsets.UTF_8);
         System.out.printf("%s",decryptedContent);
+    }
+
+    public static byte[] convertXMLDocumentToByteArray(Document xmlDocument) throws Exception {
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+
+        // Transform the XML document into a byte array
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        transformer.transform(new DOMSource(xmlDocument), new StreamResult(outputStream));
+
+        return outputStream.toByteArray();
+    }
+
+    public static Document convertByteArrayToXMLDocument(byte[] byteArray) throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(byteArray);
+
+        return builder.parse(inputStream);
     }
 
     public static Element createFolder(Document passwordDataBase, Element folder, String newFolderName) {
@@ -71,40 +141,5 @@ public class ContentManager {
         field.appendChild(passwordDataBase.createTextNode(newText));
     }
 
-    public static void writeBytesToFile(String outputFile, byte[] outputBytes) throws IOException {
-        try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
-            outputStream.write(outputBytes);
-        }
-    }
-
-    public static void listChildElements(Element folder) {
-        // System.out.println("Child elements of " + parentElement.getTagName() + ":");
-        NodeList childNodes = folder.getChildNodes();
-
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            Node node = childNodes.item(i);
-
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                Element childElement = (Element) node;
-                String elementType = null;
-                // if (childElement.getTagName().equals("dir")) {
-                //     elementType = "dir";
-                // } else if (childElement.getTagName().equals("entry")) {
-                //     element
-                // }
-                switch (childElement.getTagName()) {
-                    case "dir":
-                        elementType = "dir";
-                        break;
-                    case "entry":
-                        elementType = "entry";
-                        break;
-                    case "field":
-                        elementType = "field";
-                }
-                System.out.println(elementType+" - "+i+" - "+childElement.getAttribute("name"));
-                // System.out.printf("%s - %d) %s",elementType,i,childElement.getAttribute("name"));
-            }
-        }
-    }
+    
 }
