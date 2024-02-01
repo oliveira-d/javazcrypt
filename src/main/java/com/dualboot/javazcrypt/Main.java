@@ -22,6 +22,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
 
@@ -173,6 +174,14 @@ public class Main {
                     }
                     break;
                 case "q":
+                    break;
+                case "..":
+                    if (!currentElement.getTagName().equals("-dir-") || !currentElement.getAttribute("name").equals("root")) {
+                        Node parentNode = currentElement.getParentNode();
+                        if (parentNode != null && parentNode.getNodeType() == Node.ELEMENT_NODE) {
+                        currentElement = (Element) parentNode;
+                        }
+                    }
                     break;
                 default:
                     try {
