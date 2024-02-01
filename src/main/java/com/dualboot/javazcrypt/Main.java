@@ -4,7 +4,7 @@ import java.io.Console;
 import java.util.Scanner;
 
 import java.util.LinkedList;
-import java.util.Queue;
+import java.util.Deque;
 
 // file checking
 import java.nio.file.Files;
@@ -134,17 +134,13 @@ public class Main {
         Element currentElement = passwordDatabase.getDocumentElement(); // gets the root element
         Scanner scanner = new Scanner(System.in);
         LinkedList<String> pathL = new LinkedList<>();
-        Queue<String> pathQ = pathL;
+        Deque<String> pathQ = pathL;
         // main interaction with database
         do {
-            if (currentElement.getTagName().equals("entry")){
-                currentElement = entryMenu(passwordDatabase,currentElement,input);
-                if (currentElement == null) return;
-            }
             // display path
             System.out.printf("Path: /");
             for (int i=0; i<pathQ.size(); i++){
-                System.out.printf("%s/",pathL.get(i));
+                System.out.printf("%s/",pathL.get(pathQ.size()-1-i));
             }
             System.out.println();
 
@@ -195,7 +191,7 @@ public class Main {
                         Node parentNode = currentElement.getParentNode();
                         if (parentNode != null && parentNode.getNodeType() == Node.ELEMENT_NODE) {
                         currentElement = (Element) parentNode;
-                        pathQ.remove();
+                        pathQ.pop();
                         }
                     }
                     break;
@@ -216,15 +212,25 @@ public class Main {
                         e.printStackTrace();
                     }
             }
+            clearScreen();
             if (intInput < items) {
                 currentElement = ContentManager.getChildElement(currentElement,intInput);
-                pathQ.add(currentElement.getAttribute("name"));
+                pathQ.push(currentElement.getAttribute("name"));
+                if (currentElement.getTagName().equals("entry")){
+                    currentElement = entryMenu(passwordDatabase,currentElement,input,pathQ);
+                    if (currentElement == null) input = "q";
+                }
             }
-            clearScreen();
         } while (!input.equals("q"));
     }
 
-    private static Element entryMenu(Document passwordDatabase, Element currentElement, String input) {
+    private static Element entryMenu(Document passwordDatabase, Element currentElement, String input, Deque pathQ) {
+        Node parentNode = currentElement.getParentNode();
+        if (parentNode != null && parentNode.getNodeType() == Node.ELEMENT_NODE) {
+            currentElement = (Element) parentNode;
+            pathQ.pop();
+            return currentElement;
+        }
         return null;
     }
 
