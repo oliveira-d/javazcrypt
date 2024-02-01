@@ -130,14 +130,17 @@ public class Main {
         }
         clearScreen();
         // menu here
-        String input;
+        String input = null;
         Element currentElement = passwordDatabase.getDocumentElement(); // gets the root element
         Scanner scanner = new Scanner(System.in);
         LinkedList<String> pathL = new LinkedList<>();
         Queue<String> pathQ = pathL;
-
         // main interaction with database
         do {
+            if (currentElement.getTagName().equals("entry")){
+                currentElement = entryMenu(passwordDatabase,currentElement,input);
+                if (currentElement == null) return;
+            }
             // display path
             System.out.printf("Path: /");
             for (int i=0; i<pathQ.size(); i++){
@@ -219,6 +222,10 @@ public class Main {
             }
             clearScreen();
         } while (!input.equals("q"));
+    }
+
+    private static Element entryMenu(Document passwordDatabase, Element currentElement, String input) {
+        return null;
     }
 
     private static void clearScreen() {
