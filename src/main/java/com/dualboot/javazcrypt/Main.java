@@ -131,7 +131,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         do {
             // System.out.println("ls -l ");
-            System.out.println("ls -l");
+            System.out.println("ls -l "+currentElement.getAttribute("name"));
             int items = ContentManager.listChildElements(currentElement);
 
             System.out.println("c - create directory | e - create entry | f - edit entry field | d - delete item | q - quit | number - select directory or entry | .. - cd ..");
@@ -169,8 +169,9 @@ public class Main {
                             e.printStackTrace();
                         }
                     } else {
-                        System.out.printf("Cannot create entry.%n%s is not a folder.",currentElement.getAttribute("name"));
+                        System.out.printf("Cannot delete item.%n%s is not a folder.",currentElement.getAttribute("name"));
                     }
+                    break;
                 case "q":
                     break;
                 default:
