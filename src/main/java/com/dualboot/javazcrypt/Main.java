@@ -73,6 +73,11 @@ public class Main {
                 System.err.printf("Could not find database %s%n Exiting.%n",inputFile);
                 System.exit(1);
             }
+        } else {
+            Path inputFilePath = Paths.get(inputFile);
+            if (Files.exists(inputFilePath)) {
+                System.err.printf("File already exists. Will not overwrite %s%n Exiting.%n",inputFile);
+            }
         }
 
         if (keyFile != null) {
