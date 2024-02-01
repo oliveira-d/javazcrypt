@@ -219,32 +219,6 @@ public class Main {
             }
             clearScreen();
         } while (!input.equals("q"));
-
-        // if (operation.equals("encrypt")) {
-
-        //     // double check password
-        //     char[] passwordChars2 = console.readPassword("Confirm your password: ");
-        //     String password2 = new String(passwordChars);
-        //     if (!password2.equals(password)) {
-        //         System.err.println("Passwords don't match. Aborting operation.");
-        //         System.exit(1);
-        //     }
-
-        //     try {
-        //         byte[] encryptedBytes = CryptOps.encryptFile(inputFile, password, keyFile);
-        //         if (inPlace == true) ContentManager.writeBytesToFile(inputFile,encryptedBytes);
-        //         if (outputFile != null) ContentManager.writeBytesToFile(outputFile,encryptedBytes);
-        //     } catch (Exception e) {
-        //         System.out.println("Error while encrypting file");
-        //     }
-
-        // } else if (operation.equals("decrypt")) {
-
-
-
-        // } else {
-        //     System.err.println("Operation not recognized.");
-        // }
     }
 
     private static void clearScreen() {
