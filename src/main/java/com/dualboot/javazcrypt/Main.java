@@ -83,7 +83,7 @@ public class Main {
         } else {
             Path inputFilePath = Paths.get(inputFile);
             if (Files.exists(inputFilePath)) {
-                System.err.printf("File already exists. Will not overwrite %s%n Exiting.%n",inputFile);
+                System.err.printf("File already exists. Will not overwrite %s%nExiting.%n",inputFile);
                 System.exit(1);
             }
         }
