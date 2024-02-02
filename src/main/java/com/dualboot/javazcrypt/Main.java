@@ -31,15 +31,22 @@ import java.io.ByteArrayInputStream;
 
 public class Main {
 
+    private static LinkedList<String> pathL = new LinkedList<>();
+    private static Deque<String> pathQ = pathL;
+    // private static Document passwordDatabase;
+    private static String password;
+    private static String keyFile;
+    private static String inputFile;
+
     public static void main(String[] args) {
 
         if (args.length == 0) {
             System.err.println("No arguments were provided.\nDisplaying help instead:"); return;
         }
 
-        String keyFile = null;
+        keyFile = null;
         String operation = "open";
-        String inputFile = null;
+        inputFile = null;
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
@@ -77,6 +84,7 @@ public class Main {
             Path inputFilePath = Paths.get(inputFile);
             if (Files.exists(inputFilePath)) {
                 System.err.printf("File already exists. Will not overwrite %s%n Exiting.%n",inputFile);
+                System.exit(1);
             }
         }
 
@@ -90,7 +98,7 @@ public class Main {
 
         Console console = System.console();
         char[] passwordChars = null;
-        String password = null;
+        password = null;
         String password2 = null;
 
         if (operation.equals("create")) {
@@ -135,12 +143,35 @@ public class Main {
         }
         clearScreen();
         // menu here
-        String input = null;
         Element currentElement = passwordDatabase.getDocumentElement(); // gets the root element
-        Scanner scanner = new Scanner(System.in);
-        LinkedList<String> pathL = new LinkedList<>();
-        Deque<String> pathQ = pathL;
+        // LinkedList<String> pathL = new LinkedList<>();
+        // Deque<String> pathQ = pathL;
         // main interaction with database
+        do {
+            currentElement = mainMenu(passwordDatabase,currentElement);
+            if (currentElement != null) {
+                currentElement = entryMenu(passwordDatabase,currentElement);
+            }
+        } while (currentElement != null);
+        
+    }
+
+    // private static Element entryMenu(Document passwordDatabase, Element currentElement, String input, Deque pathQ) {
+    private static Element entryMenu(Document passwordDatabase,Element currentElement) {
+        Node parentNode = currentElement.getParentNode();
+        if (parentNode != null && parentNode.getNodeType() == Node.ELEMENT_NODE) {
+            currentElement = (Element) parentNode;
+            pathQ.pop();
+            return currentElement;
+        }
+        return null;
+    }
+
+    private static Element mainMenu(Document passwordDatabase,Element currentElement) {
+        Scanner scanner = new Scanner(System.in);
+        String input = null;
+        int items;
+        int intInput;
         do {
             // display path
             System.out.printf("Path: /");
@@ -150,12 +181,12 @@ public class Main {
             System.out.println();
 
             //display main menu
-            int items = ContentManager.listChildElements(currentElement);
+            items = ContentManager.listChildElements(currentElement);
             System.out.println("c - create directory | e - create entry | f - edit entry field | d - delete item | w - write to file | q - quit | number - select directory or entry | .. - cd ..");
             System.out.printf("Enter the chosen option: ");
             // get input and make decisions
             input = scanner.nextLine();
-            int intInput = items; // intentionally set intInput = items so that the last line in this do-while just does not execute in case there's an exception when converting string to int
+            intInput = items; // intentionally set intInput = items so that the last line in this do-while just does not execute in case there's an exception when converting string to int
             switch (input) {
                 case "c":
                     if (currentElement.getTagName().equals("dir")) {
@@ -168,7 +199,7 @@ public class Main {
                     break;
                 case "e":
                     if (currentElement.getTagName().equals("dir")) {
-                        System.out.printf("Enter directory name: ");
+                        System.out.printf("Enter entry name: ");
                         String entryName = scanner.nextLine();
                         ContentManager.createEntry(passwordDatabase,currentElement,entryName);
                     } else {
@@ -222,20 +253,10 @@ public class Main {
                 currentElement = ContentManager.getChildElement(currentElement,intInput);
                 pathQ.push(currentElement.getAttribute("name"));
                 if (currentElement.getTagName().equals("entry")){
-                    currentElement = entryMenu(passwordDatabase,currentElement,input,pathQ);
-                    if (currentElement == null) input = "q";
+                    return currentElement;
                 }
             }
         } while (!input.equals("q"));
-    }
-
-    private static Element entryMenu(Document passwordDatabase, Element currentElement, String input, Deque pathQ) {
-        Node parentNode = currentElement.getParentNode();
-        if (parentNode != null && parentNode.getNodeType() == Node.ELEMENT_NODE) {
-            currentElement = (Element) parentNode;
-            pathQ.pop();
-            return currentElement;
-        }
         return null;
     }
 
