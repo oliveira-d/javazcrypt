@@ -153,5 +153,18 @@ public class ContentManager {
         field.appendChild(passwordDataBase.createTextNode(newText));
     }
 
+    public static void deleteTextContent(Element field) {
+        // Get the list of child nodes
+        Node child = field.getFirstChild();
+
+        // Iterate through child nodes and remove text nodes
+        while (child != null) {
+            if (child.getNodeType() == Node.TEXT_NODE) {
+                field.removeChild(child);
+            }
+            child = child.getNextSibling();
+        }
+    }
+
     
 }

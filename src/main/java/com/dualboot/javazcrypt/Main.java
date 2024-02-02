@@ -26,8 +26,16 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
+
+// copy function
+import java.io.StringWriter;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 
 public class Main {
 
@@ -222,8 +230,32 @@ public class Main {
             }
             clearScreen();
             if (intInput < items) {
-                if (mode.equals("c")) System.out.println("copy");//copyFunction();
-                if (mode.equals("e")) System.out.println("editing");//edit function;
+                if (mode.equals("c")) {
+                    Element field = ContentManager.getChildElement(currentElement,intInput);
+                    String text = field.getTextContent();
+                    // TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                    try {
+                        // Transformer transformer = transformerFactory.newTransformer();
+                        // StringWriter writer = new StringWriter();
+                        // transformer.transform(new DOMSource(textNode), new StreamResult(writer));
+                        // String text = writer.toString();
+
+                        Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
+                        Clipboard clipboard = defaultToolkit.getSystemClipboard();
+                        clipboard.setContents(new StringSelection(text), null);
+                    } catch (Exception e) {
+                        System.err.println("Could not copy string to clipboard.");
+                        String enter = scanner.nextLine();
+                    }
+                }
+                if (mode.equals("e")) {
+                    System.out.println("Enter text to input: ");
+                    String text = scanner.nextLine();
+                    Text textNode = passwordDatabase.createTextNode(text);
+                    // delete old node first, otherwise the statement below will just append.
+                    ContentManager.deleteTextContent(ContentManager.getChildElement(currentElement,intInput));
+                    ContentManager.getChildElement(currentElement,intInput).appendChild(textNode);
+                }
             }
         } while (!input.equals("q"));
         return null;
