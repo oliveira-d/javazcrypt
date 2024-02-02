@@ -158,12 +158,74 @@ public class Main {
 
     // private static Element entryMenu(Document passwordDatabase, Element currentElement, String input, Deque pathQ) {
     private static Element entryMenu(Document passwordDatabase,Element currentElement) {
-        Node parentNode = currentElement.getParentNode();
-        if (parentNode != null && parentNode.getNodeType() == Node.ELEMENT_NODE) {
-            currentElement = (Element) parentNode;
-            pathQ.pop();
-            return currentElement;
-        }
+        Scanner scanner = new Scanner(System.in);
+        String input = null;
+        int items;
+        int intInput;
+        String mode = "c";
+        do {
+            // display
+            switch (mode) {
+                case "c":
+                    System.out.printf("selected mode: (c) copy%nenter (e) to enter edit mode%n");
+                    break;
+                case "e":
+                    System.out.printf("selected mode: (e) edit%nenter (c) to enter copy mode%n");
+                    break;
+            }
+            System.out.printf("Path: /");
+            for (int i=0; i<pathQ.size(); i++) {
+                System.out.printf("%s/",pathL.get(pathQ.size()-1-i));
+            }
+            System.out.println();
+            items = ContentManager.listChildElements(currentElement);
+            System.out.println("e - edit mode | c - copy mode | w - write to file | q - quit | number - select field | .. - get to parent directory");
+            System.out.printf("Enter the chosen option: ");
+            // switch-case
+            input = scanner.nextLine();
+            intInput = items; // intentionally set intInput = items so that the last line in this do-while just does not execute in case there's an exception when converting string to int
+            switch (input) {
+                case "c":
+                    mode = "c";
+                    break;
+                case "e":
+                    mode = "e";
+                    break;
+                case "w":
+                    try {
+                    byte[] decryptedBytes = ContentManager.convertXMLDocumentToByteArray(passwordDatabase);
+                    byte[] encryptedBytes = CryptOps.encryptBytes(decryptedBytes,password,keyFile);
+                    ContentManager.writeBytesToFile(inputFile,encryptedBytes);
+                    System.out.println("Content successfully written to file!");
+                    } catch (Exception e) {
+                        System.err.println("Could not write content to file.");
+                        e.printStackTrace();
+                    }
+                    break;
+                case "..":
+                    Node parentNode = currentElement.getParentNode();
+                    if (parentNode != null && parentNode.getNodeType() == Node.ELEMENT_NODE) {
+                        currentElement = (Element) parentNode;
+                        pathQ.pop();
+                        clearScreen(); // needed here while not in the mainMenu because of return statement below
+                        return currentElement;
+                    }
+                    break;
+                case "q":
+                    break;
+                default:
+                    try {
+                        intInput = Integer.parseInt(input);
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
+            }
+            clearScreen();
+            if (intInput < items) {
+                if (mode.equals("c")) System.out.println("copy");//copyFunction();
+                if (mode.equals("e")) System.out.println("editing");//edit function;
+            }
+        } while (!input.equals("q"));
         return null;
     }
 
@@ -182,13 +244,13 @@ public class Main {
 
             //display main menu
             items = ContentManager.listChildElements(currentElement);
-            System.out.println("c - create directory | e - create entry | f - edit entry field | d - delete item | w - write to file | q - quit | number - select directory or entry | .. - cd ..");
+            System.out.println("d - create directory | e - create entry | f - edit entry field | del - delete item | w - write to file | q - quit | number - select directory or entry | .. - get to parent directory");
             System.out.printf("Enter the chosen option: ");
             // get input and make decisions
             input = scanner.nextLine();
             intInput = items; // intentionally set intInput = items so that the last line in this do-while just does not execute in case there's an exception when converting string to int
             switch (input) {
-                case "c":
+                case "d":
                     if (currentElement.getTagName().equals("dir")) {
                         System.out.printf("Enter directory name: ");
                         String folderName = scanner.nextLine();
@@ -206,7 +268,7 @@ public class Main {
                         System.out.printf("Cannot create entry.%n%s is not a folder.",currentElement.getAttribute("name"));
                     }
                     break;
-                case "d":
+                case "del":
                     if (currentElement.getTagName().equals("dir")) {
                         System.out.printf("Enter index to delete: ");
                         String index = scanner.nextLine();
