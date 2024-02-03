@@ -27,6 +27,13 @@ import org.w3c.dom.NodeList;
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
 
+// copy function
+import java.io.StringWriter;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+
 public class ContentManager {
 
     private static String[] entryFields = {"user","password","URL","TOTP","notes"};
@@ -166,5 +173,9 @@ public class ContentManager {
         }
     }
 
-    
+    public static void copyToClipboard(String text) {
+        Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
+        Clipboard clipboard = defaultToolkit.getSystemClipboard();
+        clipboard.setContents(new StringSelection(text), null);
+    }
 }
