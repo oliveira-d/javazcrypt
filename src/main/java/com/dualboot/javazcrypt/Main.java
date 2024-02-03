@@ -151,7 +151,8 @@ public class Main {
         }
         clearScreen();
         // menu here
-        Element currentElement = passwordDatabase.getDocumentElement(); // gets the root element
+        // Element currentElement = passwordDatabase.getDocumentElement(); // gets the root element
+        pxmlElement currentElement = new pxmlElement(passwordDatabase);
         // LinkedList<String> pathL = new LinkedList<>();
         // Deque<String> pathQ = pathL;
         // main interaction with database
@@ -165,7 +166,7 @@ public class Main {
     }
 
     // private static Element entryMenu(Document passwordDatabase, Element currentElement, String input, Deque pathQ) {
-    private static Element entryMenu(Document passwordDatabase,Element currentElement) {
+    private static pxmlElement entryMenu(Document passwordDatabase,pxmlElement currentElement) {
         Scanner scanner = new Scanner(System.in);
         String input = null;
         int items;
@@ -186,7 +187,7 @@ public class Main {
                 System.out.printf("%s/",pathL.get(pathQ.size()-1-i));
             }
             System.out.println();
-            items = ContentManager.listChildElements(currentElement);
+            items = currentElement.listChildElements();
             System.out.println("e - edit mode | c - copy mode | w - write to file | q - quit | number - select field | .. - get to parent directory");
             System.out.printf("Enter the chosen option: ");
             // switch-case
@@ -213,7 +214,8 @@ public class Main {
                 case "..":
                     Node parentNode = currentElement.getParentNode();
                     if (parentNode != null && parentNode.getNodeType() == Node.ELEMENT_NODE) {
-                        currentElement = (Element) parentNode;
+                        Element tempElement = (Element) parentNode;
+                        currentElement = new pxmlElement(tempElement);
                         pathQ.pop();
                         clearScreen(); // needed here while not in the mainMenu because of return statement below
                         return currentElement;
@@ -235,10 +237,10 @@ public class Main {
                     String text = scanner.nextLine();
                     Text textNode = passwordDatabase.createTextNode(text);
                     // delete old node first, otherwise the statement below will just append.
-                    ContentManager.deleteTextContent(ContentManager.getChildElement(currentElement,intInput));
-                    ContentManager.getChildElement(currentElement,intInput).appendChild(textNode);
+                    currentElement.getChildElement(intInput).deleteTextContent();
+                    currentElement.getChildElement(intInput).appendChild(textNode);
                 } else {
-                    Element field = ContentManager.getChildElement(currentElement,intInput);
+                    pxmlElement field = currentElement.getChildElement(intInput);
                     String text = field.getTextContent();
                     ContentManager.copyToClipboard(text);
                 }
@@ -247,7 +249,7 @@ public class Main {
         return null;
     }
 
-    private static Element mainMenu(Document passwordDatabase,Element currentElement) {
+    private static pxmlElement mainMenu(Document passwordDatabase,pxmlElement currentElement) {
         Scanner scanner = new Scanner(System.in);
         String input = null;
         int items;
@@ -261,7 +263,7 @@ public class Main {
             System.out.println();
 
             //display main menu
-            items = ContentManager.listChildElements(currentElement);
+            items = currentElement.listChildElements();
             System.out.println("d - create directory | e - create entry | f - edit entry field | del - delete item | w - write to file | q - quit | number - select directory or entry | .. - get to parent directory");
             System.out.printf("Enter the chosen option: ");
             // get input and make decisions
@@ -272,7 +274,7 @@ public class Main {
                     if (currentElement.getTagName().equals("dir")) {
                         System.out.printf("Enter directory name: ");
                         String folderName = scanner.nextLine();
-                        ContentManager.createFolder(passwordDatabase,currentElement,folderName);
+                        currentElement.createFolder(passwordDatabase,folderName);
                     } else {
                         System.out.printf("Cannot create directory.%n%s is not a folder.",currentElement.getAttribute("name"));
                     }
@@ -281,7 +283,7 @@ public class Main {
                     if (currentElement.getTagName().equals("dir")) {
                         System.out.printf("Enter entry name: ");
                         String entryName = scanner.nextLine();
-                        ContentManager.createEntry(passwordDatabase,currentElement,entryName);
+                        currentElement.createEntry(passwordDatabase,entryName);
                     } else {
                         System.out.printf("Cannot create entry.%n%s is not a folder.",currentElement.getAttribute("name"));
                     }
@@ -292,7 +294,7 @@ public class Main {
                         String index = scanner.nextLine();
                         try {
                             int intIndex = Integer.parseInt(index);
-                            ContentManager.deleteItem(passwordDatabase,currentElement,intIndex);
+                            currentElement.deleteItem(intIndex);
                         } catch (NumberFormatException e) {
                             e.printStackTrace();
                         }
@@ -306,7 +308,8 @@ public class Main {
                     if (!currentElement.getTagName().equals("dir") || !currentElement.getAttribute("name").equals("root")) {
                         Node parentNode = currentElement.getParentNode();
                         if (parentNode != null && parentNode.getNodeType() == Node.ELEMENT_NODE) {
-                        currentElement = (Element) parentNode;
+                        Element tempElement = (Element) parentNode;
+                        currentElement = new pxmlElement(tempElement);
                         pathQ.pop();
                         }
                     }
@@ -330,7 +333,7 @@ public class Main {
             }
             clearScreen();
             if (intInput < items) {
-                currentElement = ContentManager.getChildElement(currentElement,intInput);
+                currentElement = currentElement.getChildElement(intInput);
                 pathQ.push(currentElement.getAttribute("name"));
                 if (currentElement.getTagName().equals("entry")){
                     return currentElement;
