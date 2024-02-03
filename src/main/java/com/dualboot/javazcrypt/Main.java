@@ -42,9 +42,10 @@ public class Main {
     private static LinkedList<String> pathL = new LinkedList<>();
     private static Deque<String> pathQ = pathL;
     // private static Document passwordDatabase;
-    private static String password;
-    private static String keyFile;
-    private static String inputFile;
+    private static String password = null;
+    private static String keyFile = null;
+    private static String inputFile = null;
+    private static String outputFile = null;
 
     public static void main(String[] args) {
 
@@ -52,12 +53,11 @@ public class Main {
             System.err.println("No arguments were provided.\nDisplaying help instead:"); return;
         }
 
-        keyFile = null;
         String operation = "open";
-        inputFile = null;
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
+                // arguments for the password manager
                 case "-k":
                     if (i < args.length - 1) {
                         keyFile = args[++i]; // ++i - Move to the next argument - keyfile path won't serve in switch case anyway
@@ -74,6 +74,34 @@ public class Main {
                     } else {
                         System.err.println("Missing database name.");
                     }
+                    break;
+                // file encryption utility arguments
+                case "-e":
+                case "--encrypt":
+                    operation = "encrypt";
+                    if (i < args.length - 1) {
+                        inputFile = args[++i];
+                    } else {
+                        System.err.println("Missing input file.");
+                    }
+                    break;
+                case "-d":
+                case "--decrypt":
+                    operation = "decrypt";
+                    if (i < args.length - 1) {
+                        inputFile = args[++i];
+                    } else {
+                        System.err.println("Missing input file.");
+                    }
+                    break;
+                case "-o":
+                case "--output":
+                    if (i < args.length - 1) {
+                        outputFile = args[++i];
+                    } else {
+                        System.err.println("Missing output file.");
+                    }
+                    break;
                 default:
                     inputFile = args[i];
             }
@@ -82,19 +110,21 @@ public class Main {
         if (inputFile == null) {
             System.err.println("No database specified.");
             System.exit(1);
-        } else if (!operation.equals("create")) {
-            Path inputFilePath = Paths.get(inputFile);
-            if (!Files.exists(inputFilePath) || !Files.isRegularFile(inputFilePath)) {
-                System.err.printf("Could not find database %s%n Exiting.%n",inputFile);
-                System.exit(1);
-            }
-        } else {
+        } else if (operation.equals("create")) {
             Path inputFilePath = Paths.get(inputFile);
             if (Files.exists(inputFilePath)) {
                 System.err.printf("File already exists. Will not overwrite %s%nExiting.%n",inputFile);
                 System.exit(1);
             }
+        } else {
+            Path inputFilePath = Paths.get(inputFile);
+            if (!Files.exists(inputFilePath) || !Files.isRegularFile(inputFilePath)) {
+                System.err.printf("Could not find database %s%nExiting.%n",inputFile);
+                System.exit(1);
+            }
         }
+
+        if (outputFile == null) outputFile = inputFile;
 
         if (keyFile != null) {
             Path keyFilePath = Paths.get(keyFile);
@@ -106,56 +136,43 @@ public class Main {
 
         Console console = System.console();
         char[] passwordChars = null;
-        password = null;
-        String password2 = null;
-
-        if (operation.equals("create")) {
-            try {
-                DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-                Document passwordDatabase = documentBuilder.newDocument();
-                Element rootElement = passwordDatabase.createElement("dir");
-                rootElement.setAttribute("name","root");
-                passwordDatabase.appendChild(rootElement);
-                do {
-                    passwordChars = console.readPassword("Enter a password to encrypt the file: ");
-                    password = new String(passwordChars);
-                    passwordChars = console.readPassword("Confirm your password: ");
-                    password2 = new String(passwordChars);
-                    if (!password2.equals(password)) System.out.println("Passwords do not match. Try again.");
-                } while (!password2.equals(password));
-                byte[] decryptedBytes = ContentManager.convertXMLDocumentToByteArray(passwordDatabase);
-                ContentManager.writeBytesToFile(inputFile+"decrypted",decryptedBytes);
-                byte[] encryptedBytes = CryptOps.encryptBytes(decryptedBytes,password,keyFile);
-                ContentManager.writeBytesToFile(inputFile,encryptedBytes);
-            } catch(Exception e) {
-                System.err.println("Error creating database.");
-                e.printStackTrace();
-                System.exit(1);
-            }
-
-        } else {
+        if (operation.equals("open") || operation.equals("decrypt")) {
             passwordChars = console.readPassword("Enter your password: ");
             password = new String(passwordChars);
+        } else if (operation.equals("encrypt")) { // operation is encrypt
+            passwordChars = console.readPassword("Enter a password to encrypt the file: ");
+            password = new String(passwordChars);
+        } // else operation.equals("create"), which has it's own prompt inside a do-while
+
+        Document passwordDatabase = null;
+        switch (operation) {
+            case "open":
+                passwordDatabase = openDatabase();
+                break;
+            case "create":
+                passwordDatabase = createDatabase();
+                break;
+            case "encrypt":
+                try {
+                    byte[] encryptedBytes = CryptOps.encryptFile(inputFile, password, keyFile);
+                    ContentManager.writeBytesToFile(outputFile,encryptedBytes);
+                } catch (Exception e) {
+                    System.err.println("Could not encrypt file.");
+                }
+                return;
+            case "decrypt":
+                try {
+                    byte[] decryptedBytes = CryptOps.decryptFile(inputFile, password, keyFile);
+                    ContentManager.writeBytesToFile(outputFile,decryptedBytes);
+                } catch (Exception e) {
+                    System.err.println("Could not decrypt file.");
+                }
+                return;
         }
 
-        Document passwordDatabase = null; // initialize so that I can use in the menu
-        try {
-            byte[] decryptedBytes = CryptOps.decryptFile(inputFile, password,keyFile);
-            passwordDatabase = ContentManager.convertByteArrayToXMLDocument(decryptedBytes);
-            System.out.println("Database opened successfuly.");
-            // ContentManager.printBytes(decryptedBytes);
-        } catch (Exception e) {
-            System.out.println("Error opening database");
-            System.exit(1);
-        }
-        clearScreen();
-        // menu here
-        // Element currentElement = passwordDatabase.getDocumentElement(); // gets the root element
         pxmlElement currentElement = new pxmlElement(passwordDatabase);
-        // LinkedList<String> pathL = new LinkedList<>();
-        // Deque<String> pathQ = pathL;
-        // main interaction with database
+
+        clearScreen(); 
         do {
             currentElement = mainMenu(passwordDatabase,currentElement);
             if (currentElement != null) {
@@ -165,6 +182,51 @@ public class Main {
         
     }
 
+    private static Document openDatabase() {
+        try {
+            byte[] decryptedBytes = CryptOps.decryptFile(inputFile, password,keyFile);
+            Document passwordDatabase = ContentManager.convertByteArrayToXMLDocument(decryptedBytes);
+            System.out.println("Database opened successfuly.");
+            // ContentManager.printBytes(decryptedBytes);
+            return passwordDatabase;
+        } catch (Exception e) {
+            System.out.println("Error opening database");
+            System.exit(1);
+            return null;
+        }
+    }
+
+    private static Document createDatabase() {
+        Console console = System.console();
+        char[] passwordChars = null;
+        String password2 = null;
+
+        try {
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document passwordDatabase = documentBuilder.newDocument();
+            Element rootElement = passwordDatabase.createElement("dir");
+            rootElement.setAttribute("name","root");
+            passwordDatabase.appendChild(rootElement);
+            do {
+                passwordChars = console.readPassword("Enter a password to encrypt the file: ");
+                password = new String(passwordChars);
+                passwordChars = console.readPassword("Confirm your password: ");
+                password2 = new String(passwordChars);
+                if (!password2.equals(password)) System.out.println("Passwords do not match. Try again.");
+            } while (!password2.equals(password));
+            byte[] decryptedBytes = ContentManager.convertXMLDocumentToByteArray(passwordDatabase);
+            byte[] encryptedBytes = CryptOps.encryptBytes(decryptedBytes,password,keyFile);
+            ContentManager.writeBytesToFile(inputFile,encryptedBytes);
+            return passwordDatabase;
+        } catch(Exception e) {
+            System.err.println("Error creating database.");
+            e.printStackTrace();
+            System.exit(1);
+            return null;
+        }
+
+    }
     // private static Element entryMenu(Document passwordDatabase, Element currentElement, String input, Deque pathQ) {
     private static pxmlElement entryMenu(Document passwordDatabase,pxmlElement currentElement) {
         Scanner scanner = new Scanner(System.in);
@@ -187,12 +249,12 @@ public class Main {
                 System.out.printf("%s/",pathL.get(pathQ.size()-1-i));
             }
             System.out.println();
-            items = currentElement.listChildElements();
+            items = currentElement.listChildElements(true);
             System.out.println("e - edit mode | c - copy mode | w - write to file | q - quit | number - select field | .. - get to parent directory");
             System.out.printf("Enter the chosen option: ");
             // switch-case
             input = scanner.nextLine();
-            intInput = items; // intentionally set intInput = items so that the last line in this do-while just does not execute in case there's an exception when converting string to int
+            intInput = items+1; // intentionally set intInput = items + 1 so that the last line in this do-while just does not execute in case there's an exception when converting string to int
             switch (input) {
                 case "c":
                     mode = "c";
@@ -231,16 +293,17 @@ public class Main {
                     }
             }
             clearScreen();
-            if (intInput < items) {
+            if (intInput <= items) {
                 if (mode.equals("e")) {
                     System.out.println("Enter text to input: ");
                     String text = scanner.nextLine();
                     Text textNode = passwordDatabase.createTextNode(text);
                     // delete old node first, otherwise the statement below will just append.
-                    currentElement.getChildElement(intInput).deleteTextContent();
-                    currentElement.getChildElement(intInput).appendChild(textNode);
+                    currentElement.getChildElement(intInput-1).deleteTextContent();
+                    currentElement.getChildElement(intInput-1).appendChild(textNode);
+                    clearScreen();
                 } else {
-                    pxmlElement field = currentElement.getChildElement(intInput);
+                    pxmlElement field = currentElement.getChildElement(intInput-1);
                     String text = field.getTextContent();
                     ContentManager.copyToClipboard(text);
                 }
@@ -263,12 +326,12 @@ public class Main {
             System.out.println();
 
             //display main menu
-            items = currentElement.listChildElements();
+            items = currentElement.listChildElements(false);
             System.out.println("d - create directory | e - create entry | f - edit entry field | del - delete item | w - write to file | q - quit | number - select directory or entry | .. - get to parent directory");
             System.out.printf("Enter the chosen option: ");
             // get input and make decisions
             input = scanner.nextLine();
-            intInput = items; // intentionally set intInput = items so that the last line in this do-while just does not execute in case there's an exception when converting string to int
+            intInput = items+1; // intentionally set intInput = items so that the last line in this do-while just does not execute in case there's an exception when converting string to int
             switch (input) {
                 case "d":
                     if (currentElement.getTagName().equals("dir")) {
@@ -332,8 +395,8 @@ public class Main {
                     }
             }
             clearScreen();
-            if (intInput < items) {
-                currentElement = currentElement.getChildElement(intInput);
+            if (intInput <= items) {
+                currentElement = currentElement.getChildElement(intInput-1);
                 pathQ.push(currentElement.getAttribute("name"));
                 if (currentElement.getTagName().equals("entry")){
                     return currentElement;

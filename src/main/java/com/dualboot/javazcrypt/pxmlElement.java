@@ -52,7 +52,7 @@ public class pxmlElement {
 
     // methods to list stuff
 
-    public int listChildElements() {
+    public int listChildElements(boolean showValue) {
         // System.out.println("Child elements of " + parentElement.getTagName() + ":");
         Element folder = this.element;
         NodeList childNodes = folder.getChildNodes();
@@ -78,7 +78,23 @@ public class pxmlElement {
                     case "field":
                         elementType = "field";
                 }
-                System.out.println("("+elementType+") ("+i+") "+childElement.getAttribute("name"));
+                System.out.printf("(%s) (%d) %s",elementType,i+1,childElement.getAttribute("name"));
+                if (showValue) {
+                    switch (childElement.getAttribute("name")) {
+                        case "password":
+                            System.out.printf(": ");
+                            for (int j=0; j<childElement.getTextContent().length(); j++) {
+                                System.out.printf("*");
+                            }
+                            break;
+                        case "TOTP":
+                            System.out.printf(": <TOTP DIGITS>");
+                            break;
+                        default:
+                            System.out.printf(": %s",childElement.getTextContent());                      
+                    }
+                }
+                System.out.printf("%n");
                 // System.out.printf("%s - %d) %s",elementType,i,childElement.getAttribute("name"));
             }
         }
