@@ -88,7 +88,12 @@ public class pxmlElement {
                             }
                             break;
                         case "TOTP":
-                            System.out.printf(": <TOTP DIGITS>");
+                            if (childElement.getTextContent().length() > 0) {
+                                String totp = TOTP.getCode(childElement.getTextContent());
+                                System.out.printf(": %s",totp);
+                            } else {
+                                System.out.printf(":");
+                            }
                             break;
                         default:
                             System.out.printf(": %s",childElement.getTextContent());                      

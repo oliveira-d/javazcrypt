@@ -303,8 +303,13 @@ public class Main {
                     currentElement.getChildElement(intInput-1).appendChild(textNode);
                     clearScreen();
                 } else {
-                    pxmlElement field = currentElement.getChildElement(intInput-1);
+                    pxmlElement field = currentElement.getChildElement(intInput-1);                    
                     String text = field.getTextContent();
+                    if (field.getAttribute("name").equals("TOTP")) {
+                        if (field.getTextContent().length() > 0) {
+                            text = TOTP.getCode(field.getTextContent());
+                        }
+                    }
                     ContentManager.copyToClipboard(text);
                 }
             }
