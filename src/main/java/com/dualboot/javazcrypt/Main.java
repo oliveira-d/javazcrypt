@@ -104,8 +104,11 @@ public class Main {
             }
         } else {
             Path inputFilePath = Paths.get(inputFile);
-            if (!Files.exists(inputFilePath) || !Files.isRegularFile(inputFilePath)) {
-                System.err.printf("Could not find database %s%nExiting.%n",inputFile);
+            if (!Files.exists(inputFilePath)) {
+                operation="create";
+                System.out.println("Database not found. Creating new.");
+            } else if (!Files.isRegularFile(inputFilePath)) {
+                System.err.printf("Could not find database. %s is not a regular file.%nExiting.%n",inputFile);
                 System.exit(1);
             }
         }
