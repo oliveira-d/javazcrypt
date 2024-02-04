@@ -12,5 +12,6 @@ Usage:
 java -jar javazcrypt.jar [options] <new_file>
 
 Options:
+
   -k <keyfile>	use key file with the password to encrypt the file
   --create	create new file
