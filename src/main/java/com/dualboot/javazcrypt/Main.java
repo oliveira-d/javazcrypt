@@ -20,11 +20,14 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
+// display menu
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
+
 public class Main {
 
     private static LinkedList<String> pathL = new LinkedList<>();
     private static Deque<String> pathQ = pathL;
-    // private static Document passwordDatabase;
     private static String password = null;
     private static String keyFile = null;
     private static String inputFile = null;
@@ -154,12 +157,13 @@ public class Main {
         }
 
         pxmlElement currentElement = new pxmlElement(passwordDatabase);
+        Terminal terminal = getTerminal();
 
         clearScreen(); 
         do {
-            currentElement = mainMenu(passwordDatabase,currentElement);
+            currentElement = mainMenu(passwordDatabase,currentElement,terminal);
             if (currentElement != null) {
-                currentElement = entryMenu(passwordDatabase,currentElement);
+                currentElement = entryMenu(passwordDatabase,currentElement,terminal);
             }
         } while (currentElement != null);
         
@@ -211,7 +215,7 @@ public class Main {
 
     }
     // private static Element entryMenu(Document passwordDatabase, Element currentElement, String input, Deque pathQ) {
-    private static pxmlElement entryMenu(Document passwordDatabase,pxmlElement currentElement) {
+    private static pxmlElement entryMenu(Document passwordDatabase,pxmlElement currentElement, Terminal terminal) {
         Scanner scanner = new Scanner(System.in);
         String input = null;
         int items;
@@ -227,13 +231,20 @@ public class Main {
                     System.out.printf("selected mode: (e) edit%nenter (c) to enter copy mode%n");
                     break;
             }
+            fillWidth("=",terminal);
             System.out.printf("Path: /");
             for (int i=0; i<pathQ.size(); i++) {
                 System.out.printf("%s/",pathL.get(pathQ.size()-1-i));
             }
             System.out.println();
+            fillWidth("=",terminal);
+            System.out.println();
             items = currentElement.listChildElements(true);
-            System.out.println("e - edit mode | c - copy mode | w - write to file | q - quit | number - select field | .. - get to parent directory");
+            System.out.println();
+            fillWidth("=",terminal);
+            String[] options = {" e - edit mode "," c - copy mode ", " w - write to file "," number - select field "," .. - get to parent directory "," q - quit "};
+            displayMenu(options,terminal);
+            fillWidth("=",terminal);
             System.out.printf("Enter the chosen option: ");
             // switch-case
             input = scanner.nextLine();
@@ -300,7 +311,7 @@ public class Main {
         return null;
     }
 
-    private static pxmlElement mainMenu(Document passwordDatabase,pxmlElement currentElement) {
+    private static pxmlElement mainMenu(Document passwordDatabase,pxmlElement currentElement, Terminal terminal) {
         Scanner scanner = new Scanner(System.in);
         String input = null;
         int items;
@@ -312,10 +323,15 @@ public class Main {
                 System.out.printf("%s/",pathL.get(pathQ.size()-1-i));
             }
             System.out.println();
-
+            fillWidth("=",terminal);
+            System.out.println();
             //display main menu
             items = currentElement.listChildElements(false);
-            System.out.println("d - create directory | e - create entry | f - edit entry field | del - delete item | w - write to file | q - quit | number - select directory or entry | .. - get to parent directory");
+            System.out.println();
+            fillWidth("=",terminal);
+            String[] options = {" d - create directory "," e - create entry "," del - delete item "," w - write to file "," number - open directory or entry "," .. - get to parent directory "};
+            displayMenu(options,terminal);
+            fillWidth("=",terminal);
             System.out.printf("Enter the chosen option: ");
             // get input and make decisions
             input = scanner.nextLine();
@@ -392,6 +408,47 @@ public class Main {
             }
         } while (!input.equals("q"));
         return null;
+    }
+
+    private static void displayMenu(String[] options, Terminal terminal) {
+        int terminalWidth;
+        if (terminal == null) terminalWidth = 0;
+        terminalWidth = terminal.getWidth();
+        int menuLength = 0;
+        for (int i=0; i<options.length; i++) {
+            menuLength += options[i].length();
+        }
+        int spacing = 0;
+        if (terminalWidth > menuLength) {
+            spacing = (terminalWidth-menuLength)/(options.length-1);
+        }
+        for (int i=0; i<options.length; i++) {
+            System.out.printf("%s",options[i]);
+            if (i+1 < options.length) {
+                for (int j=0; j<spacing; j++) {
+                    System.out.printf(" ");
+                }
+            }
+        }
+        System.out.printf("%n");
+    }
+
+    private static void fillWidth(String filling, Terminal terminal) {
+        if (terminal == null) return;
+        int repeat = terminal.getWidth()/filling.length();
+        for (int i=0; i<repeat; i++) {
+            System.out.printf(filling);
+        }
+        System.out.printf("%n");
+    }
+
+    private static Terminal getTerminal() {
+        try {
+            Terminal terminal = TerminalBuilder.builder().build();
+            return terminal;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private static void clearScreen() {
