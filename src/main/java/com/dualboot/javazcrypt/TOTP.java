@@ -6,7 +6,6 @@ import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.util.Base64;
 
 import org.apache.commons.codec.binary.Base32;
 

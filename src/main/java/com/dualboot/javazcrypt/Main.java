@@ -12,30 +12,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 // dont know which ones are needed
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
-import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayInputStream;
-
-// copy function
-// import java.io.StringWriter;
-// import java.awt.*;
-// import java.awt.datatransfer.Clipboard;
-// import java.awt.datatransfer.DataFlavor;
-// import java.awt.datatransfer.StringSelection;
 
 public class Main {
 
