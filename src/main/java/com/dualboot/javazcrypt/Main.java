@@ -290,7 +290,7 @@ public class Main {
                     }
             }
             clearScreen();
-            if (intInput <= items) {
+            if (intInput <= items && intInput >= 1) {
                 if (mode.equals("e")) {
                     System.out.println("Enter text to input: ");
                     String text = scanner.nextLine();
@@ -404,7 +404,7 @@ public class Main {
                     }
             }
             clearScreen();
-            if (intInput <= items) {
+            if (intInput <= items && intInput >= 1) {
                 currentElement = currentElement.getChildElement(intInput-1);
                 pathQ.push(currentElement.getAttribute("name"));
                 if (currentElement.getTagName().equals("entry")){
