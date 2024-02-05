@@ -245,8 +245,10 @@ public class Main {
             items = currentElement.listChildElements(true);
             System.out.println();
             fillWidth("=");
-            String[] options = {" e - edit mode "," c - copy mode ", " w - write to file "," number - select field "," .. - get to parent directory "," q - quit "};
-            displayMenu(options);
+            String[] options0 = {"   e - edit mode   ","  c - copy mode  "," number - select field "};
+            String[] options1 = {" w - write to file "," 0 - close entry ","        q - quit       "};
+            displayMenu(options0);
+            displayMenu(options1);
             fillWidth("=");
             System.out.printf("Enter the chosen option: ");
             // switch-case
@@ -260,17 +262,10 @@ public class Main {
                     mode = "edit";
                     break;
                 case "w":
-                    try {
-                    byte[] decryptedBytes = ContentManager.convertXMLDocumentToByteArray(passwordDatabase);
-                    byte[] encryptedBytes = CryptOps.encryptBytes(decryptedBytes,password,keyFile);
-                    ContentManager.writeBytesToFile(inputFile,encryptedBytes);
-                    System.out.println("Content successfully written to file!");
-                    } catch (Exception e) {
-                        System.err.println("Could not write content to file.");
-                        e.printStackTrace();
-                    }
+                    saveFile(passwordDatabase);
                     break;
                 case "..":
+                case "0":
                     Node parentNode = currentElement.getParentNode();
                     if (parentNode != null && parentNode.getNodeType() == Node.ELEMENT_NODE) {
                         Element tempElement = (Element) parentNode;
@@ -291,7 +286,7 @@ public class Main {
             }
             clearScreen();
             if (intInput <= items && intInput >= 1) {
-                if (mode.equals("e")) {
+                if (mode.equals("edit")) {
                     System.out.println("Enter text to input: ");
                     String text = scanner.nextLine();
                     Text textNode = passwordDatabase.createTextNode(text);
@@ -332,9 +327,9 @@ public class Main {
             items = currentElement.listChildElements(false);
             System.out.println();
             fillWidth("=");
-            String[] options0 = {" d - create directory "," e - create entry "," del - delete "," q - quit "};
-            String[] options1 = {" w - write to file "," number - open item "," .. - get to parent dir "};
-            String[] options2 = {" r - rename "," p - change password ", " k - change key file "};
+            String[] options0 = {" d - create directory ","   e - create entry   ","      r - rename      "};
+            String[] options1 = {"  w - write to file   ","      0 - cd out      ","     del - delete     "};
+            String[] options2 = {"       q - quit       ","  p - change password ", " k - change key file  "};
             displayMenu(options0);
             displayMenu(options1);
             displayMenu(options2);
@@ -375,16 +370,9 @@ public class Main {
                 case "q":
                     break;
                 case "w":
-                    try {
-                    byte[] decryptedBytes = ContentManager.convertXMLDocumentToByteArray(passwordDatabase);
-                    byte[] encryptedBytes = CryptOps.encryptBytes(decryptedBytes,password,keyFile);
-                    ContentManager.writeBytesToFile(inputFile,encryptedBytes);
-                    System.out.println("Content successfully written to file!");
-                    } catch (Exception e) {
-                        System.err.println("Could not write content to file.");
-                        e.printStackTrace();
-                    }
+                    saveFile(passwordDatabase);
                     break;
+                case "0":
                 case "..":
                     if (!currentElement.getTagName().equals("dir") || !currentElement.getAttribute("name").equals("root")) {
                         Node parentNode = currentElement.getParentNode();
@@ -418,6 +406,18 @@ public class Main {
             }
         } while (!input.equals("q"));
         return null;
+    }
+
+    private static void saveFile(Document passwordDatabase) {
+        try {
+            byte[] decryptedBytes = ContentManager.convertXMLDocumentToByteArray(passwordDatabase);
+            byte[] encryptedBytes = CryptOps.encryptBytes(decryptedBytes,password,keyFile);
+            ContentManager.writeBytesToFile(inputFile,encryptedBytes);
+            System.out.println("Content successfully written to file!");
+            } catch (Exception e) {
+                System.err.println("Could not write content to file.");
+                e.printStackTrace();
+        }
     }
 
     private static void displayMenu(String[] options) {
