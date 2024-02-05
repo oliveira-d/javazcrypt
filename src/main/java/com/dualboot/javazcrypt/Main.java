@@ -37,7 +37,7 @@ public class Main {
     public static void main(String[] args) {
 
         if (args.length == 0) {
-            System.err.println("No arguments were provided.\nDisplaying help instead:"); return;
+            System.err.println("No arguments were provided.\nDisplaying help instead:"); help(); return;
         }
 
         String operation = "open";
@@ -488,5 +488,9 @@ public class Main {
         clearScreen();
         System.out.println("Password set successfully!");
         // }
+    }
+
+    private static void help() {
+        System.out.printf("Usage:%n%njava -jar javazcrypt.jar [options] <file_path>%n%nOptions:%n%n  -k <keyfile_path>	              Use a key file, additionally to a password, to encrypt the file.%n  --create <file_path>	          Create new password database. --create is not needed anymore, as javazcrypt will try to create a password database if the specified file cannot be found.%n  -d, --decrypt                   Decrypt file.%n  -e, --encrypt                   Encrypt file.%n  -o <output_file>                Specify output file when encrypting or decrypting. If no output file is specified file will be edited in place.%nIf neither decryption or encryption operation is specified, javazcrypt will try to open or create a password database.%n%nExamples:%n%njavar -jar javazcrypt.jar myPasswordDatabase%n%njava -jar javazcrypt.jar -k keyFile myPasswordDatabase%n%njava -jar javazcrypt.jar -d myEncryptedFile%n%njava -jar javazcrypt.jar -e -o encryptedOutputFile myDecryptedFile%n%n");
     }
 }
