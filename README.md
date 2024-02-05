@@ -8,20 +8,18 @@ mvn package
 
 Usage:
 
-java -jar javazcrypt.jar [options] <file>
+java -jar javazcrypt.jar [options] <file_path>
 
 Options:
 
-  -k <keyfile>	          use key file with the password to encrypt the file
+  -k <keyfile_path>	          use key file with the password to encrypt the file
   
-  --create <new_file>	    create new file
+  --create <file_path>	          create new file
 
-  -d,--decrypt            decrypt file
+  -d,--decrypt                    decrypt file
 
-  -e,--encrypt            encrypt file
+  -e,--encrypt                    encrypt file
 
-  -o <output_file>        specify output file when encrypting or decrypting. if no output file is specified file will be edited in place
+  -o <output_file>                specify output file when encrypting or decrypting. if no output file is specified file will be edited in place
 
 If neither decryption or encryption operation is specified, javazcrypt will try to open or create a password database.
-
-  
