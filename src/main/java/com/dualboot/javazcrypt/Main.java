@@ -223,14 +223,14 @@ public class Main {
         String input = null;
         int items;
         int intInput;
-        String mode = "c";
+        String mode = "copy";
         do {
             // display
             switch (mode) {
-                case "c":
+                case "copy":
                     System.out.printf("selected mode: (c) copy%nenter (e) to enter edit mode%n");
                     break;
-                case "e":
+                case "edit":
                     System.out.printf("selected mode: (e) edit%nenter (c) to enter copy mode%n");
                     break;
             }
@@ -254,10 +254,10 @@ public class Main {
             intInput = items+1; // intentionally set intInput = items + 1 so that the last line in this do-while just does not execute in case there's an exception when converting string to int
             switch (input) {
                 case "c":
-                    mode = "c";
+                    mode = "copy";
                     break;
                 case "e":
-                    mode = "e";
+                    mode = "edit";
                     break;
                 case "w":
                     try {
@@ -332,10 +332,12 @@ public class Main {
             items = currentElement.listChildElements(false);
             System.out.println();
             fillWidth("=");
-            String[] options0 = {" d - create directory "," e - create entry "," del - delete item "};
+            String[] options0 = {" d - create directory "," e - create entry "," del - delete "," q - quit "};
             String[] options1 = {" w - write to file "," number - open item "," .. - get to parent dir "};
+            String[] options2 = {" r - rename "," p - change password ", " k - change key file "};
             displayMenu(options0);
             displayMenu(options1);
+            displayMenu(options2);
             fillWidth("=");
             System.out.printf("Enter the chosen option: ");
             // get input and make decisions
@@ -361,30 +363,16 @@ public class Main {
                     }
                     break;
                 case "del":
-                    if (currentElement.getTagName().equals("dir")) {
-                        System.out.printf("Enter index to delete: ");
-                        String index = scanner.nextLine();
-                        try {
-                            int intIndex = Integer.parseInt(index);
-                            if (intIndex <= items && intIndex >= 1) currentElement.deleteItem(intIndex-1);
-                        } catch (NumberFormatException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        System.out.printf("Cannot delete item.%n%s is not a folder.",currentElement.getAttribute("name"));
+                    System.out.printf("Enter index to delete: ");
+                    String index = scanner.nextLine();
+                    try {
+                        int intIndex = Integer.parseInt(index);
+                        if (intIndex <= items && intIndex >= 1) currentElement.deleteItem(intIndex-1);
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
                     }
                     break;
                 case "q":
-                    break;
-                case "..":
-                    if (!currentElement.getTagName().equals("dir") || !currentElement.getAttribute("name").equals("root")) {
-                        Node parentNode = currentElement.getParentNode();
-                        if (parentNode != null && parentNode.getNodeType() == Node.ELEMENT_NODE) {
-                        Element tempElement = (Element) parentNode;
-                        currentElement = new pxmlElement(tempElement);
-                        pathQ.pop();
-                        }
-                    }
                     break;
                 case "w":
                     try {
@@ -396,6 +384,23 @@ public class Main {
                         System.err.println("Could not write content to file.");
                         e.printStackTrace();
                     }
+                    break;
+                case "..":
+                    if (!currentElement.getTagName().equals("dir") || !currentElement.getAttribute("name").equals("root")) {
+                        Node parentNode = currentElement.getParentNode();
+                        if (parentNode != null && parentNode.getNodeType() == Node.ELEMENT_NODE) {
+                        Element tempElement = (Element) parentNode;
+                        currentElement = new pxmlElement(tempElement);
+                        pathQ.pop();
+                        }
+                    }
+                    break;
+                case "r":
+                    break;
+                case "p":
+                    changePassword();
+                case "k":
+                    //changeKeyFile();
                 default:
                     try {
                         intInput = Integer.parseInt(input);
