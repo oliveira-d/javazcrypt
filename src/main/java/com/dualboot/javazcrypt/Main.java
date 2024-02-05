@@ -328,8 +328,8 @@ public class Main {
             System.out.println();
             fillWidth("=");
             String[] options0 = {" d - create directory ","   e - create entry   ","      r - rename      "};
-            String[] options1 = {"  w - write to file   ","      0 - cd out      ","     del - delete     "};
-            String[] options2 = {"       q - quit       ","  p - change password ", " k - change key file  "};
+            String[] options1 = {"  w - write to file   ","   .. or 0 - cd out   ","     del - delete     "};
+            String[] options2 = {"       q - quit       ","  p - change password "," k - change key file  "};
             displayMenu(options0);
             displayMenu(options1);
             displayMenu(options2);
