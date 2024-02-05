@@ -332,8 +332,10 @@ public class Main {
             items = currentElement.listChildElements(false);
             System.out.println();
             fillWidth("=",terminal);
-            String[] options = {" d - create directory "," e - create entry "," del - delete item "," w - write to file "," number - open directory or entry "," .. - get to parent directory "};
-            displayMenu(options,terminal);
+            String[] options0 = {" d - create directory "," e - create entry "," del - delete item "};
+            String[] options1 = {" w - write to file "," number - open item "," .. - get to parent dir "};
+            displayMenu(options0,terminal);
+            displayMenu(options1,terminal);
             fillWidth("=",terminal);
             System.out.printf("Enter the chosen option: ");
             // get input and make decisions
@@ -423,15 +425,13 @@ public class Main {
         }
         int spacing = 0;
         if (terminalWidth > menuLength) {
-            spacing = (terminalWidth-menuLength)/(options.length-1);
+            spacing = (terminalWidth-menuLength)/(options.length+1);
         }
         for (int i=0; i<options.length; i++) {
-            System.out.printf("%s",options[i]);
-            if (i+1 < options.length) {
-                for (int j=0; j<spacing; j++) {
+            for (int j=0; j<spacing; j++) {
                     System.out.printf(" ");
-                }
             }
+            System.out.printf("%s",options[i]);
         }
         System.out.printf("%n");
     }
