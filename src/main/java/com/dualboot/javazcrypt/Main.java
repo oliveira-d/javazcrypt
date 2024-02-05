@@ -366,7 +366,7 @@ public class Main {
                         String index = scanner.nextLine();
                         try {
                             int intIndex = Integer.parseInt(index);
-                            currentElement.deleteItem(intIndex);
+                            if (intIndex <= items && intIndex >= 1) currentElement.deleteItem(intIndex-1);
                         } catch (NumberFormatException e) {
                             e.printStackTrace();
                         }
