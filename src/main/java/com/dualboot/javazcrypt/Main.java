@@ -394,6 +394,18 @@ public class Main {
                     }
                     break;
                 case "r":
+                    System.out.printf("Enter index to rename: ");
+                    index = scanner.nextLine();
+                    try {
+                        int intIndex = Integer.parseInt(index);
+                        if (intIndex <= items && intIndex >= 1) {
+                            System.out.printf("Enter new name: ");
+                            String name = scanner.nextLine();
+                            currentElement.getChildElement(intIndex-1).setAttribute("name",name);
+                        }
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case "p":
                     changePassword();
