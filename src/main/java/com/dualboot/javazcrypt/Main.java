@@ -113,14 +113,21 @@ public class Main {
             }
         }
 
+        // get password
         Console console = System.console();
         char[] passwordChars = null;
         if (operation.equals("open") || operation.equals("decrypt")) {
             passwordChars = console.readPassword("Enter your password: ");
             password = new String(passwordChars);
-        } else if (operation.equals("encrypt")) { // operation is encrypt
-            passwordChars = console.readPassword("Enter a password to encrypt the file: ");
-            password = new String(passwordChars);
+        } else { // if (operation.equals("encrypt") || operation.equals("create"))
+            String password2 = null;
+            do {
+                passwordChars = console.readPassword("Enter a password to encrypt the file: ");
+                password = new String(passwordChars);
+                passwordChars = console.readPassword("Confirm your password: ");
+                password2 = new String(passwordChars);
+                if (!password2.equals(password)) System.out.println("Passwords do not match. Try again.");
+            } while (!password2.equals(password));
         } // else operation.equals("create"), which has it's own prompt inside a do-while
 
         Document passwordDatabase = null;
@@ -148,6 +155,8 @@ public class Main {
                 }
                 return;
         }
+
+        if (passwordDatabase == null) System.exit(1);
 
         pxmlElement currentElement = new pxmlElement(passwordDatabase);
 
@@ -186,16 +195,11 @@ public class Main {
             return passwordDatabase;
         } catch (Exception e) {
             System.out.println("Error opening database");
-            System.exit(1);
             return null;
         }
     }
 
     private static Document createDatabase() {
-        Console console = System.console();
-        char[] passwordChars = null;
-        String password2 = null;
-
         try {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
@@ -203,13 +207,6 @@ public class Main {
             Element rootElement = passwordDatabase.createElement("dir");
             rootElement.setAttribute("name","root");
             passwordDatabase.appendChild(rootElement);
-            do {
-                passwordChars = console.readPassword("Enter a password to encrypt the file: ");
-                password = new String(passwordChars);
-                passwordChars = console.readPassword("Confirm your password: ");
-                password2 = new String(passwordChars);
-                if (!password2.equals(password)) System.out.println("Passwords do not match. Try again.");
-            } while (!password2.equals(password));
             byte[] decryptedBytes = ContentManager.convertXMLDocumentToByteArray(passwordDatabase);
             byte[] encryptedBytes = CryptOps.encryptBytes(decryptedBytes,password,keyFile);
             ContentManager.writeBytesToFile(inputFile,encryptedBytes);
@@ -217,11 +214,10 @@ public class Main {
         } catch(Exception e) {
             System.err.println("Error creating database.");
             e.printStackTrace();
-            System.exit(1);
             return null;
         }
-
     }
+
     // private static Element entryMenu(Document passwordDatabase, Element currentElement, String input, Deque pathQ) {
     private static pxmlElement entryMenu(Document passwordDatabase,pxmlElement currentElement) {
         Scanner scanner = new Scanner(System.in);
