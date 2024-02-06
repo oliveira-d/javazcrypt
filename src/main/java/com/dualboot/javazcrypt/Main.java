@@ -33,7 +33,8 @@ public class Main {
     private static String inputFile = null;
     private static String outputFile = null;
     private static Terminal terminal = getTerminal();
-        
+    private static pxmlElement clipboardElement = null; // leave it to the class so that is doesn't lose itself when switching between mainMenu() and entryMenu()
+
     public static void main(String[] args) {
 
         if (args.length == 0) {
@@ -317,7 +318,6 @@ public class Main {
         String input = null;
         int items;
         int intInput;
-        pxmlElement clipboardElement = null;
         do {
             // display clipboard
             if (clipboardElement != null) {
