@@ -164,6 +164,10 @@ public class pxmlElement {
         this.element.appendChild(textNode);
     }
 
+    public void appendChild(pxmlElement childElement) {
+        this.element.appendChild(childElement.element);
+    }
+
     public String getTextContent() {
         return this.element.getTextContent();
     }
@@ -174,6 +178,10 @@ public class pxmlElement {
 
     public String getAttribute(String key) {
         return this.element.getAttribute(key);
+    }
+
+    public Element getElement() {
+        return this.element;
     }
 
     

@@ -37,7 +37,7 @@ public class Main {
     public static void main(String[] args) {
 
         if (args.length == 0) {
-            System.err.println("No arguments were provided.\nDisplaying help instead:"); help(); return;
+            System.err.println("No arguments were provided.\nDisplaying help."); help(); return;
         }
 
         String operation = "open";
@@ -89,6 +89,9 @@ public class Main {
                         System.err.println("Missing output file.");
                     }
                     break;
+                case "-h":
+                case "--help":
+                    help();
                 default:
                     inputFile = args[i];
             }
@@ -314,8 +317,14 @@ public class Main {
         String input = null;
         int items;
         int intInput;
+        pxmlElement clipboardElement = null;
         do {
+            // display clipboard
+            if (clipboardElement != null) {
+                System.out.println("On clipboard: "+clipboardElement.getAttribute("name")+" - enter mv to move it here.");
+            }
             // display path
+            fillWidth("=");
             System.out.printf("Path: /");
             for (int i=0; i<pathQ.size(); i++){
                 System.out.printf("%s/",pathL.get(pathQ.size()-1-i));
@@ -330,6 +339,7 @@ public class Main {
             String[] options0 = {" d - create directory ","   e - create entry   ","      r - rename      "};
             String[] options1 = {"  w - write to file   ","   .. or 0 - cd out   ","     del - delete     "};
             String[] options2 = {"       q - quit       ","  p - change password "," k - change key file  "};
+            String[] options3 = {"      mv - move       ","      f - new file    ","   of - output file   "};
             displayMenu(options0);
             displayMenu(options1);
             displayMenu(options2);
@@ -387,8 +397,24 @@ public class Main {
                     break;
                 case "p":
                     changePassword();
+                    break;
                 case "k":
                     //changeKeyFile();
+                    break;
+                case "mv":
+                    if (clipboardElement == null) {
+                        System.out.printf("Enter index to move: ");
+                        index = scanner.nextLine();
+                        try {
+                            int intIndex = Integer.parseInt(index);
+                            if (intIndex <= items && intIndex >= 1) clipboardElement = currentElement.getChildElement(intIndex-1);
+                        } catch (NumberFormatException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        currentElement.appendChild(clipboardElement);
+                        clipboardElement = null;
+                    }
                 default:
                     try {
                         intInput = Integer.parseInt(input);
@@ -491,6 +517,32 @@ public class Main {
     }
 
     private static void help() {
-        System.out.printf("Usage:%n%njava -jar javazcrypt.jar [options] <file_path>%n%nOptions:%n%n  -k <keyfile_path>	              Use a key file, additionally to a password, to encrypt the file.%n  --create <file_path>	          Create new password database. --create is not needed anymore, as javazcrypt will try to create a password database if the specified file cannot be found.%n  -d, --decrypt                   Decrypt file.%n  -e, --encrypt                   Encrypt file.%n  -o <output_file>                Specify output file when encrypting or decrypting. If no output file is specified file will be edited in place.%nIf neither decryption or encryption operation is specified, javazcrypt will try to open or create a password database.%n%nExamples:%n%njavar -jar javazcrypt.jar myPasswordDatabase%n%njava -jar javazcrypt.jar -k keyFile myPasswordDatabase%n%njava -jar javazcrypt.jar -d myEncryptedFile%n%njava -jar javazcrypt.jar -e -o encryptedOutputFile myDecryptedFile%n%n");
+        String help = """
+        Usage:
+
+        java -jar javazcrypt.jar [options] <file_path>
+
+        Options:
+
+        -k <keyfile_path>  Use a key file, additionally to a password.
+        -d, --decrypt      Decrypt file.
+        -e, --encrypt      Encrypt file.
+        -o <output_file>   Specify output file when encrypting or decrypting. 
+                        If no output file is specified file will be edited in place.
+
+        If neither decryption or encryption operation is specified, 
+        javazcrypt will try to open or create a password database.
+
+        Examples:
+
+        javar -jar javazcrypt.jar myPasswordDatabase
+
+        java -jar javazcrypt.jar -k keyFile myPasswordDatabase
+
+        java -jar javazcrypt.jar -d myEncryptedFile
+
+        java -jar javazcrypt.jar -e -o encryptedOutputFile myDecryptedFile
+        """;
+        System.out.println(help);
     }
 }
