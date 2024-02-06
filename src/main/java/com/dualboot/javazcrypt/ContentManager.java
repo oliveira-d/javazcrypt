@@ -3,6 +3,13 @@ package com.dualboot.javazcrypt;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+// file checking
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+// base 64 
+import java.util.Base64;
+
 import java.nio.charset.StandardCharsets;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -59,5 +66,26 @@ public class ContentManager {
         Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
         Clipboard clipboard = defaultToolkit.getSystemClipboard();
         clipboard.setContents(new StringSelection(text), null);
+    }
+
+    public static String encodeBase64(String file) {
+        try {
+            byte[] inputFileBytes = Files.readAllBytes(Paths.get(file));
+            String base64EncodedFile = Base64.getEncoder().encodeToString(inputFileBytes);
+            return base64EncodedFile;
+        } catch (Exception e) {
+            System.err.println("Could not read file "+file);
+        }
+        return null;
+    }
+
+    public static void outputEncodedFile(pxmlElement currentElement,String outputFile) {
+        String encodedFile = currentElement.getTextContent();
+        byte[] decodedData = Base64.getDecoder().decode(encodedFile);
+        try {
+            writeBytesToFile(outputFile,decodedData);
+        } catch (IOException e) {
+            System.err.println("Could not write content to file.");
+        }
     }
 }

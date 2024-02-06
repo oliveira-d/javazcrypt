@@ -128,8 +128,8 @@ public class Main {
                 password2 = new String(passwordChars);
                 if (!password2.equals(password)) System.out.println("Passwords do not match. Try again.");
             } while (!password2.equals(password));
-        } // else operation.equals("create"), which has it's own prompt inside a do-while
-
+        }
+        
         Document passwordDatabase = null;
         switch (operation) {
             case "open":
