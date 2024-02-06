@@ -67,20 +67,10 @@ public class Main {
                 case "-e":
                 case "--encrypt":
                     operation = "encrypt";
-                    if (i < args.length - 1) {
-                        inputFile = args[++i];
-                    } else {
-                        System.err.println("Missing input file.");
-                    }
                     break;
                 case "-d":
                 case "--decrypt":
                     operation = "decrypt";
-                    if (i < args.length - 1) {
-                        inputFile = args[++i];
-                    } else {
-                        System.err.println("Missing input file.");
-                    }
                     break;
                 case "-o":
                 case "--output":
@@ -101,28 +91,23 @@ public class Main {
         if (inputFile == null) {
             System.err.println("No database specified.");
             System.exit(1);
-        } else if (operation.equals("create")) {
-            Path inputFilePath = Paths.get(inputFile);
-            if (Files.exists(inputFilePath)) {
-                System.err.printf("File already exists. Will not overwrite %s%nExiting.%n",inputFile);
-                System.exit(1);
-            }
-        } else {
-            Path inputFilePath = Paths.get(inputFile);
-            if (!Files.exists(inputFilePath)) {
-                operation="create";
-                System.out.println("Database not found. Creating new.");
-            } else if (!Files.isRegularFile(inputFilePath)) {
-                System.err.printf("Could not find database. %s is not a regular file.%nExiting.%n",inputFile);
-                System.exit(1);
-            }
+        } else if (!fileExists(inputFile)) {
+            operation="create";
+            System.out.println("Database not found. Creating new.");
+        } else if (!isRegularFile(inputFile)) {
+            System.err.printf("Cannot open database. %s is not a regular file.%nExiting.%n",inputFile);
+            System.exit(1);
         }
 
-        if (outputFile == null) outputFile = inputFile;
+        if (outputFile == null) {
+            outputFile = inputFile;
+        } else if (fileExists(outputFile)) {
+            System.err.println("File already exists. Will not overwrite.");
+            System.exit(1);
+        }
 
         if (keyFile != null) {
-            Path keyFilePath = Paths.get(keyFile);
-            if (!Files.exists(keyFilePath) || !Files.isRegularFile(keyFilePath)) {
+            if (!fileExists(keyFile)) {
                 System.err.printf("Could not find key file %s%nExiting.%n",keyFile);
                 System.exit(1);
             }
@@ -174,6 +159,22 @@ public class Main {
             }
         } while (currentElement != null);
         
+    }
+
+    private static boolean fileExists(String file) {
+        Path filePath = Paths.get(file);
+        if (Files.exists(filePath)) {
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean isRegularFile(String file) {
+        Path filePath = Paths.get(file);
+        if (Files.exists(filePath) && Files.isRegularFile(filePath)) {
+            return true;
+        }
+        return false;
     }
 
     private static Document openDatabase() {
