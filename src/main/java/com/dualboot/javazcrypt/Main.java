@@ -26,6 +26,11 @@ import org.w3c.dom.Text;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
+// autocompletion
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.impl.completer.FileNameCompleter; // Import FileNameCompleter from correct package
+
 public class Main {
 
     private static LinkedList<String> pathL = new LinkedList<>();
@@ -297,7 +302,7 @@ public class Main {
                             currentElement.getChildElement(index-1).deleteTextContent();
                             currentElement.getChildElement(index-1).appendChild(textNode);
                         } else {
-                            pxmlElement field = currentElement.getChildElement(index-1);                    
+                            pxmlElement field = currentElement.getChildElement(index-1);
                             String text = field.getTextContent();
                             if (field.getAttribute("name").equals("TOTP")) {
                                 if (field.getTextContent().length() > 0) {
@@ -319,6 +324,7 @@ public class Main {
         int items;
         int index;
         pxmlElement fileElement = null;
+        LineReader lineReader = null;
         do {
             // display clipboard
             if (clipboardElement != null) {
@@ -433,8 +439,12 @@ public class Main {
                     }
                     break;
                 case "if":
-                    System.out.printf("Enter the path for the file you wish to import to this database: ");
-                    String importedFile = scanner.nextLine();
+                    lineReader = LineReaderBuilder.builder().terminal(terminal).completer(new FileNameCompleter()).build();
+                    String importedFile = lineReader.readLine("Enter the path for the file you wish to import to this database: ");
+                    while (importedFile.endsWith(" ")) {
+                        // Remove the space using substring to avoid exception
+                        importedFile = importedFile.substring(0, importedFile.length() - 1);
+                    }
                     byte[] fileBytes = null; // compiler complains if i don't initialize it 
                     try {
                         fileBytes = Files.readAllBytes(Paths.get(importedFile));
@@ -464,8 +474,12 @@ public class Main {
                         }
                         String encodedBytes = fileElement.getTextContent();
                         byte[] decodedBytes = Base64.getDecoder().decode(encodedBytes);
-                        System.out.printf("Enter file to output data: ");
-                        String outputDecodedFile = scanner.nextLine();
+                        lineReader = LineReaderBuilder.builder().terminal(terminal).completer(new FileNameCompleter()).build();
+                        String outputDecodedFile = lineReader.readLine("Enter file to output data: ");
+                        while (outputDecodedFile.endsWith(" ")) {
+                            // Remove the space using substring to avoid exception
+                            outputDecodedFile = outputDecodedFile.substring(0, outputDecodedFile.length() - 1);
+                        }
                         try{
                             ContentManager.writeBytesToFile(outputDecodedFile,decodedBytes);
                         } catch (IOException e) {
