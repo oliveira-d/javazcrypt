@@ -426,8 +426,9 @@ public class Main {
                         currentElement.appendChild(clipboardElement);
                         clipboardElement = null;
                     }
+                    break;
                 case "if":
-                    System.out.printf("Enter the path for the file you wish to save in this database: ");
+                    System.out.printf("Enter the path for the file you wish to import to this database: ");
                     String file = scanner.nextLine();
                     byte[] fileBytes = null; // compiler complains if i don't initialize it 
                     try {
@@ -441,6 +442,27 @@ public class Main {
                     String base64EncodedFile = Base64.getEncoder().encodeToString(fileBytes);
                     pxmlElement fileElement = currentElement.createFile(passwordDatabase,newFileName);
                     fileElement.inputText(passwordDatabase,base64EncodedFile);
+                    break;
+                case "ef":
+                    System.out.printf("Enter index of the file you want to output: ");
+                    int indexo = scanner.nextInt();
+                    scanner.nextLine();
+                    if (indexo <= items && indexo >= 1) {
+                        pxmlElement file1 = currentElement.getChildElement(indexo-1);
+                        if (!file1.getTagName().equals("file")) {
+                            System.err.println("Cannot complete operation: "+file1.getAttribute("name")+" is not a file.");
+                            break;
+                        }
+                        String encodedBytes = file1.getTextContent();
+                        byte[] decodedBytes = Base64.getDecoder().decode(encodedBytes);
+                        System.out.printf("Enter file to output data: ");
+                        String outputDecodedFile = scanner.nextLine();
+                        try{
+                            ContentManager.writeBytesToFile(outputDecodedFile,decodedBytes);
+                        } catch (IOException e) {
+                            System.err.println("Could not output decoded file.");
+                        }
+                    }
                     break;
                 default:
                     try {
