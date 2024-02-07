@@ -339,10 +339,11 @@ public class Main {
             String[] options0 = {" d - create directory ","   e - create entry   ","      r - rename      "};
             String[] options1 = {"  w - write to file   ","   .. or 0 - cd out   ","     del - delete     "};
             String[] options2 = {"       q - quit       ","  p - change password "," k - change key file  "};
-            String[] options3 = {"      mv - move       ","      f - new file    ","   of - output file   "};
+            String[] options3 = {"      mv - move       ","   if - import file   ","   of - output file   "};
             displayMenu(options0);
             displayMenu(options1);
             displayMenu(options2);
+            displayMenu(options3);
             fillWidth("=");
             System.out.printf("Enter the chosen option: ");
             // get input and make decisions
