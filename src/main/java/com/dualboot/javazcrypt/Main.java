@@ -225,7 +225,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         String input = null;
         int items;
-        int intInput;
+        int index;
         String mode = "copy";
         do {
             // display
@@ -256,7 +256,7 @@ public class Main {
             System.out.printf("Enter the chosen option: ");
             // switch-case
             input = scanner.nextLine();
-            intInput = items+1; // intentionally set intInput = items + 1 so that the last line in this do-while just does not execute in case there's an exception when converting string to int
+            index = items+1; // intentionally set index > items + 1 so that the last line in this do-while just does not execute in case there's an exception when converting string to int
             switch (input) {
                 case "c":
                     mode = "copy";
@@ -282,31 +282,31 @@ public class Main {
                     break;
                 default:
                     try {
-                        intInput = Integer.parseInt(input);
+                        index = Integer.parseInt(input);
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
-            }
-            clearScreen();
-            if (intInput <= items && intInput >= 1) {
-                if (mode.equals("edit")) {
-                    System.out.println("Enter text to input: ");
-                    String text = scanner.nextLine();
-                    Text textNode = passwordDatabase.createTextNode(text);
-                    // delete old node first, otherwise the statement below will just append.
-                    currentElement.getChildElement(intInput-1).deleteTextContent();
-                    currentElement.getChildElement(intInput-1).appendChild(textNode);
                     clearScreen();
-                } else {
-                    pxmlElement field = currentElement.getChildElement(intInput-1);                    
-                    String text = field.getTextContent();
-                    if (field.getAttribute("name").equals("TOTP")) {
-                        if (field.getTextContent().length() > 0) {
-                            text = TOTP.getCode(field.getTextContent());
+                    if (index <= items && index >= 1) {
+                        if (mode.equals("edit")) {
+                            System.out.println("Enter text to input: ");
+                            String text = scanner.nextLine();
+                            Text textNode = passwordDatabase.createTextNode(text);
+                            // delete old node first, otherwise the statement below will just append.
+                            currentElement.getChildElement(index-1).deleteTextContent();
+                            currentElement.getChildElement(index-1).appendChild(textNode);
+                            clearScreen();
+                        } else {
+                            pxmlElement field = currentElement.getChildElement(index-1);                    
+                            String text = field.getTextContent();
+                            if (field.getAttribute("name").equals("TOTP")) {
+                                if (field.getTextContent().length() > 0) {
+                                    text = TOTP.getCode(field.getTextContent());
+                                }
+                            }
+                            ContentManager.copyToClipboard(text);
                         }
                     }
-                    ContentManager.copyToClipboard(text);
-                }
             }
         } while (!input.equals("q"));
         return null;
@@ -316,7 +316,8 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         String input = null;
         int items;
-        int intInput;
+        int index;
+        pxmlElement fileElement = null;
         do {
             // display clipboard
             if (clipboardElement != null) {
@@ -346,7 +347,7 @@ public class Main {
             System.out.printf("Enter the chosen option: ");
             // get input and make decisions
             input = scanner.nextLine();
-            intInput = items+1; // intentionally set intInput = items so that the last line in this do-while just does not execute in case there's an exception when converting string to int
+            index = items+1; // intentionally set index > items so that the last line in this do-while just does not execute in case there's an exception when converting string to int
             switch (input) {
                 case "d":
                     if (currentElement.getTagName().equals("dir")) {
@@ -368,12 +369,9 @@ public class Main {
                     break;
                 case "del":
                     System.out.printf("Enter index to delete: ");
-                    String index = scanner.nextLine();
-                    try {
-                        int intIndex = Integer.parseInt(index);
-                        if (intIndex <= items && intIndex >= 1) currentElement.deleteItem(intIndex-1);
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace();
+                    index = scanner.nextInt(); scanner.nextLine();
+                    if (index <= items && index >= 1) {
+                        currentElement.deleteItem(index-1);
                     }
                     break;
                 case "q":
@@ -386,24 +384,19 @@ public class Main {
                     if (!currentElement.getTagName().equals("dir") || !currentElement.getAttribute("name").equals("root")) {
                         Node parentNode = currentElement.getParentNode();
                         if (parentNode != null && parentNode.getNodeType() == Node.ELEMENT_NODE) {
-                        Element tempElement = (Element) parentNode;
-                        currentElement = new pxmlElement(tempElement);
-                        pathQ.pop();
+                            Element tempElement = (Element) parentNode;
+                            currentElement = new pxmlElement(tempElement);
+                            pathQ.pop();
                         }
                     }
                     break;
                 case "r":
                     System.out.printf("Enter index to rename: ");
-                    index = scanner.nextLine();
-                    try {
-                        int intIndex = Integer.parseInt(index);
-                        if (intIndex <= items && intIndex >= 1) {
-                            System.out.printf("Enter new name: ");
-                            String name = scanner.nextLine();
-                            currentElement.getChildElement(intIndex-1).setAttribute("name",name);
-                        }
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace();
+                    index = scanner.nextInt(); scanner.nextLine();
+                    if (index <= items && index >= 1) {
+                        System.out.printf("Enter new name: ");
+                        String name = scanner.nextLine();
+                        currentElement.getChildElement(index-1).setAttribute("name",name);
                     }
                     break;
                 case "p":
@@ -415,13 +408,8 @@ public class Main {
                 case "mv":
                     if (clipboardElement == null) {
                         System.out.printf("Enter index to move: ");
-                        index = scanner.nextLine();
-                        try {
-                            int intIndex = Integer.parseInt(index);
-                            if (intIndex <= items && intIndex >= 1) clipboardElement = currentElement.getChildElement(intIndex-1);
-                        } catch (NumberFormatException e) {
-                            e.printStackTrace();
-                        }
+                        index = scanner.nextInt(); scanner.nextLine();
+                        if (index <= items && index >= 1) clipboardElement = currentElement.getChildElement(index-1);
                     } else {
                         currentElement.appendChild(clipboardElement);
                         clipboardElement = null;
@@ -429,31 +417,30 @@ public class Main {
                     break;
                 case "if":
                     System.out.printf("Enter the path for the file you wish to import to this database: ");
-                    String file = scanner.nextLine();
+                    String importedFile = scanner.nextLine();
                     byte[] fileBytes = null; // compiler complains if i don't initialize it 
                     try {
-                        fileBytes = Files.readAllBytes(Paths.get(file));
+                        fileBytes = Files.readAllBytes(Paths.get(importedFile));
                     } catch (IOException e) {
-                        System.err.println("Could not open file "+file);
+                        System.err.println("Could not open file "+importedFile);
                         break;
                     }
                     System.out.printf("Enter new name for the file: ");
                     String newFileName = scanner.nextLine();
                     String base64EncodedFile = Base64.getEncoder().encodeToString(fileBytes);
-                    pxmlElement fileElement = currentElement.createFile(passwordDatabase,newFileName);
+                    fileElement = currentElement.createFile(passwordDatabase,newFileName);
                     fileElement.inputText(passwordDatabase,base64EncodedFile);
                     break;
                 case "ef":
                     System.out.printf("Enter index of the file you want to output: ");
-                    int indexo = scanner.nextInt();
-                    scanner.nextLine();
-                    if (indexo <= items && indexo >= 1) {
-                        pxmlElement file1 = currentElement.getChildElement(indexo-1);
-                        if (!file1.getTagName().equals("file")) {
-                            System.err.println("Cannot complete operation: "+file1.getAttribute("name")+" is not a file.");
+                    index = scanner.nextInt(); scanner.nextLine();
+                    if (index <= items && index >= 1) {
+                        fileElement = currentElement.getChildElement(index-1);
+                        if (!fileElement.getTagName().equals("file")) {
+                            System.err.println("Cannot complete operation: "+fileElement.getAttribute("name")+" is not a file.");
                             break;
                         }
-                        String encodedBytes = file1.getTextContent();
+                        String encodedBytes = fileElement.getTextContent();
                         byte[] decodedBytes = Base64.getDecoder().decode(encodedBytes);
                         System.out.printf("Enter file to output data: ");
                         String outputDecodedFile = scanner.nextLine();
@@ -466,18 +453,18 @@ public class Main {
                     break;
                 default:
                     try {
-                        intInput = Integer.parseInt(input);
+                        index = Integer.parseInt(input);
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
-            }
-            clearScreen();
-            if (intInput <= items && intInput >= 1) {
-                currentElement = currentElement.getChildElement(intInput-1);
-                pathQ.push(currentElement.getAttribute("name"));
-                if (currentElement.getTagName().equals("entry")){
-                    return currentElement;
-                }
+                    clearScreen();
+                    if (index <= items && index >= 1) {
+                        currentElement = currentElement.getChildElement(index-1);
+                        pathQ.push(currentElement.getAttribute("name"));
+                        if (currentElement.getTagName().equals("entry")){
+                            return currentElement;
+                        }
+                    }
             }
         } while (!input.equals("q"));
         return null;
