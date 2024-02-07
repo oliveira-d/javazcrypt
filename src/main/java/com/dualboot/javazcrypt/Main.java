@@ -295,7 +295,6 @@ public class Main {
                             // delete old node first, otherwise the statement below will just append.
                             currentElement.getChildElement(index-1).deleteTextContent();
                             currentElement.getChildElement(index-1).appendChild(textNode);
-                            clearScreen();
                         } else {
                             pxmlElement field = currentElement.getChildElement(index-1);                    
                             String text = field.getTextContent();
@@ -308,6 +307,7 @@ public class Main {
                         }
                     }
             }
+            clearScreen();
         } while (!input.equals("q"));
         return null;
     }
@@ -458,15 +458,16 @@ public class Main {
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
-                    clearScreen();
                     if (index <= items && index >= 1) {
                         currentElement = currentElement.getChildElement(index-1);
                         pathQ.push(currentElement.getAttribute("name"));
                         if (currentElement.getTagName().equals("entry")){
+                            clearScreen();
                             return currentElement;
                         }
                     }
             }
+            clearScreen();
         } while (!input.equals("q"));
         return null;
     }
