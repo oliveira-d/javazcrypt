@@ -371,7 +371,12 @@ public class Main {
                     break;
                 case "del":
                     System.out.printf("Enter index to delete: ");
-                    index = scanner.nextInt(); scanner.nextLine();
+                    input = scanner.nextLine();
+                    try {
+                        index = Integer.parseInt(input);
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
                     if (index <= items && index >= 1) {
                         currentElement.deleteItem(index-1);
                     }
@@ -394,7 +399,12 @@ public class Main {
                     break;
                 case "r":
                     System.out.printf("Enter index to rename: ");
-                    index = scanner.nextInt(); scanner.nextLine();
+                    input = scanner.nextLine();
+                    try {
+                        index = Integer.parseInt(input);
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
                     if (index <= items && index >= 1) {
                         System.out.printf("Enter new name: ");
                         String name = scanner.nextLine();
@@ -410,7 +420,12 @@ public class Main {
                 case "mv":
                     if (clipboardElement == null) {
                         System.out.printf("Enter index to move: ");
-                        index = scanner.nextInt(); scanner.nextLine();
+                        input = scanner.nextLine();
+                        try {
+                            index = Integer.parseInt(input);
+                        } catch (NumberFormatException e) {
+                            e.printStackTrace();
+                        }
                         if (index <= items && index >= 1) clipboardElement = currentElement.getChildElement(index-1);
                     } else {
                         currentElement.appendChild(clipboardElement);
@@ -435,7 +450,12 @@ public class Main {
                     break;
                 case "ef":
                     System.out.printf("Enter index of the file you want to output: ");
-                    index = scanner.nextInt(); scanner.nextLine();
+                    input = scanner.nextLine();
+                    try {
+                        index = Integer.parseInt(input);
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
                     if (index <= items && index >= 1) {
                         fileElement = currentElement.getChildElement(index-1);
                         if (!fileElement.getTagName().equals("file")) {
@@ -460,6 +480,7 @@ public class Main {
                         e.printStackTrace();
                     }
                     if (index <= items && index >= 1) {
+                        if (currentElement.getChildElement(index-1).getTagName().equals("file")) break;
                         currentElement = currentElement.getChildElement(index-1);
                         pathQ.push(currentElement.getAttribute("name"));
                         if (currentElement.getTagName().equals("entry")){
