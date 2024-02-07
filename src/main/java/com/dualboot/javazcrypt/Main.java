@@ -85,6 +85,7 @@ public class Main {
                 case "-h":
                 case "--help":
                     help();
+                    return;
                 default:
                     inputFile = args[i];
             }
