@@ -33,23 +33,23 @@ public class pxmlElement {
 
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element childElement = (Element) node;
-                String elementType = null;
+                // String elementType = null;
                 // if (childElement.getTagName().equals("dir")) {
                 //     elementType = "dir";
                 // } else if (childElement.getTagName().equals("entry")) {
                 //     element
                 // }
-                switch (childElement.getTagName()) {
-                    case "dir":
-                        elementType = "dir";
-                        break;
-                    case "entry":
-                        elementType = "entry";
-                        break;
-                    case "field":
-                        elementType = "field";
-                }
-                System.out.printf("(%s) (%d) %s",elementType,i+1,childElement.getAttribute("name"));
+                // switch (childElement.getTagName()) {
+                //     case "dir":
+                //         elementType = "dir";
+                //         break;
+                //     case "entry":
+                //         elementType = "entry";
+                //         break;
+                //     case "field":
+                //         elementType = "field";
+                // }
+                System.out.printf("(%s) (%d) %s",childElement.getTagName(),i+1,childElement.getAttribute("name"));
                 if (showValue) {
                     switch (childElement.getAttribute("name")) {
                         case "password":
@@ -99,6 +99,18 @@ public class pxmlElement {
         return new pxmlElement(newFolder);
     }
 
+    public pxmlElement createFile(Document passwordDataBase, String newFileName) {
+        Element folder = this.element;
+        if (!folder.getTagName().equals("dir")){
+            System.err.println("Failed to create file inside"+folder.getAttribute("name")+". "+folder.getAttribute("name")+" is not a folder.");
+            return new pxmlElement(folder);
+        }
+        Element newFile = passwordDataBase.createElement("file");
+        newFile.setAttribute("name",newFileName);
+        folder.appendChild(newFile);
+        return new pxmlElement(newFile);
+    }
+
     public pxmlElement createEntry(Document passwordDatabase, String newEntryName) {
         Element folder = this.element;
         if (!folder.getTagName().equals("dir")){
@@ -131,8 +143,8 @@ public class pxmlElement {
 
     public void inputText(Document passwordDataBase, String newText) {
         Element field = this.element;
-        if (!field.getTagName().equals("field")) {
-            System.err.println("Failed to write to field. "+field.getAttribute("name")+" is note an input field.");
+        if (!field.getTagName().equals("field") && !field.getTagName().equals("file")) {
+            System.err.println("Failed to write text to item. "+field.getAttribute("name")+" is not an input field or a file.");
             return;
         }
         field.appendChild(passwordDataBase.createTextNode(newText));

@@ -11,6 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import java.util.Base64;
+
 // dont know which ones are needed
 import java.io.IOException;
 import javax.xml.parsers.DocumentBuilder;
@@ -424,6 +426,22 @@ public class Main {
                         currentElement.appendChild(clipboardElement);
                         clipboardElement = null;
                     }
+                case "if":
+                    System.out.printf("Enter the path for the file you wish to save in this database: ");
+                    String file = scanner.nextLine();
+                    byte[] fileBytes = null; // compiler complains if i don't initialize it 
+                    try {
+                        fileBytes = Files.readAllBytes(Paths.get(file));
+                    } catch (IOException e) {
+                        System.err.println("Could not open file "+file);
+                        break;
+                    }
+                    System.out.printf("Enter new name for the file: ");
+                    String newFileName = scanner.nextLine();
+                    String base64EncodedFile = Base64.getEncoder().encodeToString(fileBytes);
+                    pxmlElement fileElement = currentElement.createFile(passwordDatabase,newFileName);
+                    fileElement.inputText(passwordDatabase,base64EncodedFile);
+                    break;
                 default:
                     try {
                         intInput = Integer.parseInt(input);
