@@ -473,6 +473,14 @@ public class Main {
                         // Remove the space using substring to avoid exception - this space may occur when completing with tab
                         importedFile = importedFile.substring(0, importedFile.length() - 1);
                     }
+                    if (!isRegularFile(importedFile)) {
+                        System.err.println("Cannot import file. "+importedFile+" is not a regular file.");
+                        break;
+                    }
+                    if (!Files.isReadable(FileSystems.getDefault().getPath(importedFile))){
+                        System.err.println("Cannot import file. "+importedFile+" is not readable.");
+                        break;
+                    }
                     byte[] fileBytes = null; // compiler complains if i don't initialize it
                     try {
                         fileBytes = Files.readAllBytes(Paths.get(importedFile));
