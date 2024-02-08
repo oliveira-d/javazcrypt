@@ -172,8 +172,8 @@ public class Main {
         if (passwordDatabase == null) System.exit(1);
 
         pxmlElement currentElement = new pxmlElement(passwordDatabase);
-        System.setProperty("org.jline.terminal.impl.jna.WinSysTerminal.useForwardSlashPath","true"); // fix tab completion
-        clearScreen();
+
+        clearScreen(); 
         do {
             currentElement = mainMenu(passwordDatabase,currentElement);
             if (currentElement != null) {
