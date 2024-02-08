@@ -45,6 +45,7 @@ public class Main {
     private static Terminal terminal = getTerminal();
     private static pxmlElement clipboardElement = null; // leave it to the class so that is doesn't lose itself when switching between mainMenu() and entryMenu()
     private static boolean saved = true;
+    private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
 
@@ -179,9 +180,10 @@ public class Main {
                 currentElement = entryMenu(passwordDatabase,currentElement);
             }
         } while (currentElement != null);
+
         System.out.printf("There are changes not saved to the file. Would you like to write to disk? (y/n): ");
-        Scanner scanner = new Scanner(System.in);
         String answer = scanner.nextLine();
+        scanner.close();
         answer = answer.toLowerCase();
         if (answer.equals("y") || answer.equals("yes")) saveFile(passwordDatabase);
     }
@@ -236,7 +238,6 @@ public class Main {
 
     // private static Element entryMenu(Document passwordDatabase, Element currentElement, String input, Deque pathQ) {
     private static pxmlElement entryMenu(Document passwordDatabase,pxmlElement currentElement) {
-        Scanner scanner = new Scanner(System.in);
         String input = null;
         int items;
         int index;
@@ -327,7 +328,6 @@ public class Main {
     }
 
     private static pxmlElement mainMenu(Document passwordDatabase,pxmlElement currentElement) {
-        Scanner scanner = new Scanner(System.in);
         String input = null;
         int items;
         int index;
