@@ -11,6 +11,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+// check is file is readable/writable
+import java.nio.file.FileSystems;
+
 import java.util.Base64;
 
 // dont know which ones are needed
@@ -421,7 +424,21 @@ public class Main {
                     changePassword();
                     break;
                 case "k":
-                    //changeKeyFile();
+                    lineReader = LineReaderBuilder.builder().terminal(terminal).completer(new FileNameCompleter()).build();
+                    keyFile = lineReader.readLine("Enter path to key file: ");
+                    while (keyFile.endsWith(" ")) {
+                        // Remove the space using substring to avoid exception - this space may occur when completing with tab
+                        keyFile = keyFile.substring(0, keyFile.length() - 1);
+                    }
+                    if (fileExists(keyFile)) {
+                        if (!Files.isReadable(FileSystems.getDefault().getPath(keyFile))) {
+                            System.err.println("Cannot read key file "+keyFile);
+                            keyFile = null;
+                        }
+                    } else {
+                        System.err.println("Cannot find key file"+keyFile);
+                        keyFile = null;
+                    }
                     break;
                 case "mv":
                     if (clipboardElement == null) {
