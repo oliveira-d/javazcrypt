@@ -44,6 +44,7 @@ public class Main {
     private static String outputFile = null;
     private static Terminal terminal = getTerminal();
     private static pxmlElement clipboardElement = null; // leave it to the class so that is doesn't lose itself when switching between mainMenu() and entryMenu()
+    private static boolean saved = true;
 
     public static void main(String[] args) {
 
@@ -178,7 +179,11 @@ public class Main {
                 currentElement = entryMenu(passwordDatabase,currentElement);
             }
         } while (currentElement != null);
-        
+        System.out.printf("There are changes not saved to the file. Would you like to write to disk? (y/n): ");
+        Scanner scanner = new Scanner(System.in);
+        String answer = scanner.nextLine();
+        answer = answer.toLowerCase();
+        if (answer.equals("y") || answer.equals("yes")) saveFile(passwordDatabase);
     }
 
     private static boolean fileExists(String file) {
@@ -365,6 +370,7 @@ public class Main {
                         System.out.printf("Enter directory name: ");
                         String folderName = scanner.nextLine();
                         currentElement.createFolder(passwordDatabase,folderName);
+                        saved = false;
                     } else {
                         System.out.printf("Cannot create directory.%n%s is not a folder.",currentElement.getAttribute("name"));
                     }
@@ -374,6 +380,7 @@ public class Main {
                         System.out.printf("Enter entry name: ");
                         String entryName = scanner.nextLine();
                         currentElement.createEntry(passwordDatabase,entryName);
+                        saved = false;
                     } else {
                         System.out.printf("Cannot create entry.%n%s is not a folder.",currentElement.getAttribute("name"));
                     }
@@ -388,6 +395,7 @@ public class Main {
                     }
                     if (index <= items && index >= 1) {
                         currentElement.deleteItem(index-1);
+                        saved = false;
                     }
                     break;
                 case "q":
@@ -418,6 +426,7 @@ public class Main {
                         System.out.printf("Enter new name: ");
                         String name = scanner.nextLine();
                         currentElement.getChildElement(index-1).setAttribute("name",name);
+                        saved = false;
                     }
                     break;
                 case "p":
@@ -430,11 +439,12 @@ public class Main {
                         // Remove the space using substring to avoid exception - this space may occur when completing with tab
                         keyFile = keyFile.substring(0, keyFile.length() - 1);
                     }
-                    if (fileExists(keyFile)) {
+                    if (fileExists(keyFile) && isRegularFile(keyFile)) {
                         if (!Files.isReadable(FileSystems.getDefault().getPath(keyFile))) {
                             System.err.println("Cannot read key file "+keyFile);
                             keyFile = null;
                         }
+                        saved = false;
                     } else {
                         System.err.println("Cannot find key file"+keyFile);
                         keyFile = null;
@@ -453,6 +463,7 @@ public class Main {
                     } else {
                         currentElement.appendChild(clipboardElement);
                         clipboardElement = null;
+                        saved = false;
                     }
                     break;
                 case "if":
@@ -474,6 +485,7 @@ public class Main {
                     String base64EncodedFile = Base64.getEncoder().encodeToString(fileBytes);
                     fileElement = currentElement.createFile(passwordDatabase,newFileName);
                     fileElement.inputText(passwordDatabase,base64EncodedFile);
+                    saved = false;
                     break;
                 case "ef":
                     System.out.printf("Enter index of the file you want to output: ");
@@ -531,6 +543,7 @@ public class Main {
             byte[] encryptedBytes = CryptOps.encryptBytes(decryptedBytes,password,keyFile);
             ContentManager.writeBytesToFile(inputFile,encryptedBytes);
             System.out.println("Content successfully written to file!");
+            saved = true;
             } catch (Exception e) {
                 System.err.println("Could not write content to file.");
                 e.printStackTrace();
