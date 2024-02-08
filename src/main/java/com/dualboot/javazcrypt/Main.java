@@ -442,10 +442,10 @@ public class Main {
                     lineReader = LineReaderBuilder.builder().terminal(terminal).completer(new FileNameCompleter()).build();
                     String importedFile = lineReader.readLine("Enter the path for the file you wish to import to this database: ");
                     while (importedFile.endsWith(" ")) {
-                        // Remove the space using substring to avoid exception
+                        // Remove the space using substring to avoid exception - this space may occur when completing with tab
                         importedFile = importedFile.substring(0, importedFile.length() - 1);
                     }
-                    byte[] fileBytes = null; // compiler complains if i don't initialize it 
+                    byte[] fileBytes = null; // compiler complains if i don't initialize it
                     try {
                         fileBytes = Files.readAllBytes(Paths.get(importedFile));
                     } catch (IOException e) {
