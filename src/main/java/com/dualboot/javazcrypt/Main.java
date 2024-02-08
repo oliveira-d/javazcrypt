@@ -31,6 +31,9 @@ import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.impl.completer.FileNameCompleter; // Import FileNameCompleter from correct package
 
+// generate passwd
+import java.security.SecureRandom;
+
 public class Main {
 
     private static LinkedList<String> pathL = new LinkedList<>();
@@ -563,6 +566,17 @@ public class Main {
         // ANSI escape code to clear the screen
         System.out.print("\033[H\033[2J");
         System.out.flush();
+    }
+
+    private static String generatePassword(int length, String possibleCharacters) {
+        SecureRandom random = new SecureRandom();
+        StringBuilder stringBuilder = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            int randomIndex = random.nextInt(possibleCharacters.length());
+            char randomChar = possibleCharacters.charAt(randomIndex);
+            stringBuilder.append(randomChar);
+        }
+        return stringBuilder.toString();
     }
 
     private static void changePassword() {
