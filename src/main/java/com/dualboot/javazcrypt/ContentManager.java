@@ -30,6 +30,7 @@ import java.awt.datatransfer.StringSelection;
 public class ContentManager {
 
     private static String[] entryFields = {"user","password","URL","TOTP","notes"};
+    public static int passwordIndex = 1;
 
     public static void writeBytesToFile(String outputFile, byte[] outputBytes) throws IOException {
         try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {

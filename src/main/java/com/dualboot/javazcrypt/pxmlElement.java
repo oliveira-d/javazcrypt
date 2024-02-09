@@ -123,7 +123,7 @@ public class pxmlElement {
         for (int i=0; i<entryFields.length; i++) {
             Element newField = passwordDatabase.createElement("field");
             newField.setAttribute("name",entryFields[i]);
-            newEntry.appendChild(newField);            
+            newEntry.appendChild(newField);
         }
         return new pxmlElement(newEntry);
     }

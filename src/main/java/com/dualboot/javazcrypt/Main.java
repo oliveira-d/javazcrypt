@@ -321,8 +321,8 @@ public class Main {
                         int length = Integer.parseInt(input);
                         String entryPassword = generatePassword(length,chosenPasswordsElements);
                         Text textNode = passwordDatabase.createTextNode(entryPassword);
-                        currentElement.getChildElement(1).deleteTextContent(); // passwordEntry = 1
-                        currentElement.getChildElement(1).appendChild(textNode);
+                        currentElement.getChildElement(ContentManager.passwordIndex).deleteTextContent(); // passwordEntry = 1
+                        currentElement.getChildElement(ContentManager.passwordIndex).appendChild(textNode);
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
