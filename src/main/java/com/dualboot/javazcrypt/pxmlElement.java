@@ -33,7 +33,7 @@ public class pxmlElement {
 
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element childElement = (Element) node;
-                System.out.printf("(%s) (%d) %s",childElement.getTagName(),i+1,childElement.getAttribute("name"));
+                System.out.printf("(%-"+7+"s (%d) %s",childElement.getTagName()+")",i+1,childElement.getAttribute("name"));
                 if (showValue) {
                     switch (childElement.getAttribute("name")) {
                         case "password":

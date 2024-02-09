@@ -188,14 +188,16 @@ public class Main {
                 currentElement = entryMenu(passwordDatabase,currentElement);
             }
         } while (currentElement != null);
-
-        System.out.printf("There are changes not saved to the file. Would you like to write to disk? (y/n): ");
-        String answer = scanner.nextLine();
-        scanner.close();
-        answer = answer.toLowerCase();
-        if (answer.equals("y") || answer.equals("yes")) saveFile(passwordDatabase);
         timer.cancel();
         ContentManager.copyToClipboard(null); // clear clipboard in case the timer hasn't gotten to do so
+
+        if(!saved) {
+            System.out.printf("There are changes not saved to the file. Would you like to write to disk? (y/n): ");
+            String answer = scanner.nextLine();
+            answer = answer.toLowerCase();
+            if (answer.equals("y") || answer.equals("yes")) saveFile(passwordDatabase);
+        }
+        scanner.close();
     }
 
     private static boolean fileExists(String file) {
