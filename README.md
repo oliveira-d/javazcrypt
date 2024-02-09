@@ -12,17 +12,14 @@ java -jar javazcrypt.jar [options] <file_path>
 
 Options:
 
-  -k <keyfile_path>	              Use a key file, additionally to a password, to encrypt the file.
+-k <keyfile_path>  Use a key file, additionally to a password.
+-d, --decrypt      Decrypt file.
+-e, --encrypt      Encrypt file.
+-o <output_file>   Specify output file when encrypting or decrypting.
+                If no output file is specified file will be edited in place.
 
-  --create <file_path>	          Create new password database. --create is not needed anymore, as javazcrypt will try to create a password database if the specified file cannot be found.
-
-  -d, --decrypt                   Decrypt file.
-
-  -e, --encrypt                   Encrypt file.
-
-  -o <output_file>                Specify output file when encrypting or decrypting. If no output file is specified file will be edited in place
-
-If neither decryption or encryption operation is specified, javazcrypt will try to open or create a password database.
+If neither decryption or encryption operation is specified,
+javazcrypt will try to open or create a password database.
 
 Examples:
 
