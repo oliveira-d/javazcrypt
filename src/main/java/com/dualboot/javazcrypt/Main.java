@@ -345,11 +345,17 @@ public class Main {
                     if (index <= items && index >= 1) {
                         if (mode.equals("edit")) {
                             LineReader lineReader = LineReaderBuilder.builder().terminal(terminal).build();
-                            String text = lineReader.readLine("Edit "+currentElement.getChildElement(index-1).getAttribute("name")+": ",null,currentElement.getChildElement(index-1).getTextContent());
+                            pxmlElement field = currentElement.getChildElement(index-1);
+                            String text = null;
+                            if (field.getAttribute("name").equals("TOTP")) {
+                                text = lineReader.readLine("Edit "+field.getAttribute("name")+" secret key: ",null,field.getTextContent());
+                            } else {
+                                text = lineReader.readLine("Edit "+field.getAttribute("name")+": ",null,field.getTextContent());
+                            }
                             Text textNode = passwordDatabase.createTextNode(text);
                             // delete old node first, otherwise the statement below will just append.
-                            currentElement.getChildElement(index-1).deleteTextContent();
-                            currentElement.getChildElement(index-1).appendChild(textNode);
+                            field.deleteTextContent();
+                            field.appendChild(textNode);
                         } else {
                             pxmlElement field = currentElement.getChildElement(index-1);
                             String text = field.getTextContent();
