@@ -37,6 +37,10 @@ import org.jline.reader.impl.completer.FileNameCompleter; // Import FileNameComp
 // generate passwd
 import java.security.SecureRandom;
 
+// clear clipboard
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class Main {
 
     private static LinkedList<String> pathL = new LinkedList<>();
@@ -49,6 +53,7 @@ public class Main {
     private static pxmlElement clipboardElement = null; // leave it to the class so that is doesn't lose itself when switching between mainMenu() and entryMenu()
     private static boolean saved = true;
     private static Scanner scanner = new Scanner(System.in);
+    private static Timer timer = new Timer();
 
     public static void main(String[] args) {
 
@@ -189,6 +194,7 @@ public class Main {
         scanner.close();
         answer = answer.toLowerCase();
         if (answer.equals("y") || answer.equals("yes")) saveFile(passwordDatabase);
+        timer.cancel();
     }
 
     private static boolean fileExists(String file) {
@@ -345,6 +351,12 @@ public class Main {
                                 }
                             }
                             ContentManager.copyToClipboard(text);
+                            timer.schedule(new TimerTask() {
+                                @Override
+                                public void run() {
+                                    ContentManager.copyToClipboard(null);
+                                }
+                            }, 10000); // run in 10k milisseconds
                         }
                     }
             }
