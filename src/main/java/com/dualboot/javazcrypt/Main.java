@@ -53,7 +53,7 @@ public class Main {
     private static pxmlElement clipboardElement = null; // leave it to the class so that is doesn't lose itself when switching between mainMenu() and entryMenu()
     private static boolean saved = true;
     private static Scanner scanner = new Scanner(System.in);
-    private static Timer timer = new Timer();
+    private static Timer timer = null; // do not initialize timer here. For operations other than manipulating the database the timer won't be canceled and program will hang instead of quitting
     private static String message = null;
 
     public static void main(String[] args) {
@@ -182,7 +182,8 @@ public class Main {
 
         pxmlElement currentElement = new pxmlElement(passwordDatabase);
 
-        clearScreen(); 
+        clearScreen();
+        timer = new Timer(); // timer is only initialized here to avoid the program hanging instead of finishing execution after operations executed previously in the code 
         do {
             currentElement = mainMenu(passwordDatabase,currentElement);
             if (currentElement != null) {
