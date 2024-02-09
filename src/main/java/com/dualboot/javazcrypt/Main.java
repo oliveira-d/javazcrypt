@@ -264,10 +264,10 @@ public class Main {
             // display
             switch (mode) {
                 case "copy":
-                    System.out.printf("selected mode: (c) copy%nenter (e) to enter edit mode%n");
+                    System.out.printf("selected mode: (c) copy%nenter (e) for edit mode%n");
                     break;
                 case "edit":
-                    System.out.printf("selected mode: (e) edit%nenter (c) to enter copy mode%n");
+                    System.out.printf("selected mode: (e) edit%nenter (c) for copy mode%n");
                     break;
             }
             fillWidth("=");
