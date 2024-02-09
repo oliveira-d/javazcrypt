@@ -342,11 +342,10 @@ public class Main {
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
-                    clearScreen();
                     if (index <= items && index >= 1) {
                         if (mode.equals("edit")) {
-                            System.out.println("Enter text to input: ");
-                            String text = scanner.nextLine();
+                            LineReader lineReader = LineReaderBuilder.builder().terminal(terminal).build();
+                            String text = lineReader.readLine("Edit "+currentElement.getChildElement(index-1).getAttribute("name")+": ",null,currentElement.getChildElement(index-1).getTextContent());
                             Text textNode = passwordDatabase.createTextNode(text);
                             // delete old node first, otherwise the statement below will just append.
                             currentElement.getChildElement(index-1).deleteTextContent();
