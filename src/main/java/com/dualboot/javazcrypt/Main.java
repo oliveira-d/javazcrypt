@@ -268,8 +268,10 @@ public class Main {
             fillWidth("=");
             String[] options0 = {"   e - edit mode   ","  c - copy mode  "," number - select field "};
             String[] options1 = {" w - write to file "," 0 - close entry ","        q - quit       "};
+            String[] options2 = {" t - TOTP settings ","                 "," g - generate password "};
             displayMenu(options0);
             displayMenu(options1);
+            displayMenu(options2);
             fillWidth("=");
             System.out.printf("Enter the chosen option: ");
             // switch-case
@@ -297,6 +299,33 @@ public class Main {
                     }
                     break;
                 case "q":
+                    break;
+                case "t":
+                    // setup totp
+                case "g":
+                    String[] allPasswordElements = {"qwertyuiopasdfghjklçzxcvbnm","QWERTYUIOPASDFGHJKLÇZXCVBNM","0123456789","!@#$%¨&*()_+`´[]{}~^;:.><"}; // NO ALPHABETICAL ORDER, DEAL WITH IT      
+                    for (int i=0; i<allPasswordElements.length; i++) {
+                        System.out.println((i+1)+") "+allPasswordElements[i]);
+                    }
+                    System.out.printf("Enter the indexes of elements you want in your password: ");
+                    input = scanner.nextLine();
+                    String chosenPasswordsElements = null;
+                    for (int i=0; i<allPasswordElements.length; i++) {
+                        if(input.contains(String.valueOf(i+1))) {
+                            chosenPasswordsElements += allPasswordElements[i];
+                        }
+                    }
+                    System.out.printf("Enter desired password length: ");
+                    input = scanner.nextLine();
+                    try {
+                        int length = Integer.parseInt(input);
+                        String entryPassword = generatePassword(length,chosenPasswordsElements);
+                        Text textNode = passwordDatabase.createTextNode(entryPassword);
+                        currentElement.getChildElement(1).deleteTextContent(); // passwordEntry = 1
+                        currentElement.getChildElement(1).appendChild(textNode);
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 default:
                     try {
