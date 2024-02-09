@@ -54,6 +54,7 @@ public class Main {
     private static boolean saved = true;
     private static Scanner scanner = new Scanner(System.in);
     private static Timer timer = new Timer();
+    private static String message = null;
 
     public static void main(String[] args) {
 
@@ -255,6 +256,11 @@ public class Main {
         int index;
         String mode = "copy";
         do {
+            if (message != null) {
+                System.out.println(message);
+                message = null;
+                fillWidth("=");
+            }
             // display
             switch (mode) {
                 case "copy":
@@ -375,8 +381,13 @@ public class Main {
         pxmlElement fileElement = null;
         LineReader lineReader = null;
         do {
+            if (message != null) {
+                System.out.println(message);
+                message = null;
+            }
             // display clipboard
             if (clipboardElement != null) {
+                fillWidth("=");
                 System.out.println("On clipboard: "+clipboardElement.getAttribute("name")+" - enter mv to move it here.");
             }
             // display path
@@ -482,12 +493,12 @@ public class Main {
                     }
                     if (fileExists(keyFile) && isRegularFile(keyFile)) {
                         if (!Files.isReadable(FileSystems.getDefault().getPath(keyFile))) {
-                            System.err.println("Cannot read key file "+keyFile);
+                            message = "Cannot read key file "+keyFile;
                             keyFile = null;
                         }
                         saved = false;
                     } else {
-                        System.err.println("Cannot find key file"+keyFile);
+                        message = "Cannot find key file"+keyFile;
                         keyFile = null;
                     }
                     break;
@@ -515,18 +526,18 @@ public class Main {
                         importedFile = importedFile.substring(0, importedFile.length() - 1);
                     }
                     if (!isRegularFile(importedFile)) {
-                        System.err.println("Cannot import file. "+importedFile+" is not a regular file.");
+                        message = "Cannot import file: "+importedFile+" is not a regular file.";
                         break;
                     }
                     if (!Files.isReadable(FileSystems.getDefault().getPath(importedFile))){
-                        System.err.println("Cannot import file. "+importedFile+" is not readable.");
+                        message = "Cannot import file: "+importedFile+" is not readable.";
                         break;
                     }
                     byte[] fileBytes = null; // compiler complains if i don't initialize it
                     try {
                         fileBytes = Files.readAllBytes(Paths.get(importedFile));
                     } catch (IOException e) {
-                        System.err.println("Could not open file "+importedFile);
+                        message = "Could not open file "+importedFile;
                         break;
                     }
                     System.out.printf("Enter new name for the file: ");
@@ -547,7 +558,7 @@ public class Main {
                     if (index <= items && index >= 1) {
                         fileElement = currentElement.getChildElement(index-1);
                         if (!fileElement.getTagName().equals("file")) {
-                            System.err.println("Cannot complete operation: "+fileElement.getAttribute("name")+" is not a file.");
+                            message = "Cannot complete operation: "+fileElement.getAttribute("name")+" is not a file.";
                             break;
                         }
                         String encodedBytes = fileElement.getTextContent();
@@ -561,7 +572,7 @@ public class Main {
                         try{
                             ContentManager.writeBytesToFile(outputDecodedFile,decodedBytes);
                         } catch (IOException e) {
-                            System.err.println("Could not output decoded file.");
+                            message = "Could not output decoded file.";
                         }
                     }
                     break;
@@ -594,7 +605,7 @@ public class Main {
             System.out.println("Content successfully written to file!");
             saved = true;
             } catch (Exception e) {
-                System.err.println("Could not write content to file.");
+                message = "Could not write content to file.";
                 e.printStackTrace();
         }
     }
