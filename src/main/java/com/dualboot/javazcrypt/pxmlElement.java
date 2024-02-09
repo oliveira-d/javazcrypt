@@ -33,22 +33,6 @@ public class pxmlElement {
 
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element childElement = (Element) node;
-                // String elementType = null;
-                // if (childElement.getTagName().equals("dir")) {
-                //     elementType = "dir";
-                // } else if (childElement.getTagName().equals("entry")) {
-                //     element
-                // }
-                // switch (childElement.getTagName()) {
-                //     case "dir":
-                //         elementType = "dir";
-                //         break;
-                //     case "entry":
-                //         elementType = "entry";
-                //         break;
-                //     case "field":
-                //         elementType = "field";
-                // }
                 System.out.printf("(%s) (%d) %s",childElement.getTagName(),i+1,childElement.getAttribute("name"));
                 if (showValue) {
                     switch (childElement.getAttribute("name")) {
