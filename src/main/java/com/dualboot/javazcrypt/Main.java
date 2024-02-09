@@ -195,6 +195,7 @@ public class Main {
         answer = answer.toLowerCase();
         if (answer.equals("y") || answer.equals("yes")) saveFile(passwordDatabase);
         timer.cancel();
+        ContentManager.copyToClipboard(null); // clear clipboard in case the timer hasn't gotten to do so
     }
 
     private static boolean fileExists(String file) {
