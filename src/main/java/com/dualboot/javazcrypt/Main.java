@@ -286,7 +286,7 @@ public class Main {
             displayMenu(options0);
             displayMenu(options1);
             fillWidth("=");
-            System.out.printf("Enter the chosen option: ");
+            System.out.printf("Enter menu option: ");
             // switch-case
             input = scanner.nextLine();
             index = items+1; // intentionally set index > items + 1 so that the last line in this do-while just does not execute in case there's an exception when converting string to int
@@ -411,7 +411,7 @@ public class Main {
             displayMenu(options2);
             displayMenu(options3);
             fillWidth("=");
-            System.out.printf("Enter the chosen option: ");
+            System.out.printf("Enter menu option: ");
             // get input and make decisions
             input = scanner.nextLine();
             index = items+1; // intentionally set index > items so that the last line in this do-while just does not execute in case there's an exception when converting string to int
