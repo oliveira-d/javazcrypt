@@ -266,12 +266,10 @@ public class Main {
             items = currentElement.listChildElements(true);
             System.out.println();
             fillWidth("=");
-            String[] options0 = {"   e - edit mode   ","  c - copy mode  "," number - select field "};
-            String[] options1 = {" w - write to file "," 0 - close entry ","        q - quit       "};
-            String[] options2 = {" t - TOTP settings ","                 "," g - generate password "};
+            String[] options0 = {" number - select field ","   e - edit mode   ","  c - copy mode  "};
+            String[] options1 = {" g - generate password "," w - write to file "," 0 - close entry "};
             displayMenu(options0);
             displayMenu(options1);
-            displayMenu(options2);
             fillWidth("=");
             System.out.printf("Enter the chosen option: ");
             // switch-case
@@ -298,18 +296,14 @@ public class Main {
                         return currentElement;
                     }
                     break;
-                case "q":
-                    break;
-                case "t":
-                    // setup totp
                 case "g":
-                    String[] allPasswordElements = {"qwertyuiopasdfghjklçzxcvbnm","QWERTYUIOPASDFGHJKLÇZXCVBNM","0123456789","!@#$%¨&*()_+`´[]{}~^;:.><"}; // NO ALPHABETICAL ORDER, DEAL WITH IT      
+                    String[] allPasswordElements = {"qwertyuiopasdfghjklçzxcvbnm","QWERTYUIOPASDFGHJKLÇZXCVBNM","0123456789","!@#$%¨&*()_-+=`´[]{}~^;:.><","¬¹²³£¢§°®ŧ←↓→øþ´ªæßðđŋħˀĸł´ºˇ«»©„“”µ•·̣"}; // NO ALPHABETICAL ORDER, DEAL WITH IT      
                     for (int i=0; i<allPasswordElements.length; i++) {
                         System.out.println((i+1)+") "+allPasswordElements[i]);
                     }
                     System.out.printf("Enter the indexes of elements you want in your password: ");
                     input = scanner.nextLine();
-                    String chosenPasswordsElements = null;
+                    String chosenPasswordsElements = "";
                     for (int i=0; i<allPasswordElements.length; i++) {
                         if(input.contains(String.valueOf(i+1))) {
                             chosenPasswordsElements += allPasswordElements[i];
