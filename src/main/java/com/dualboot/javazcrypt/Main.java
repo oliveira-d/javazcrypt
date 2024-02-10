@@ -424,24 +424,16 @@ public class Main {
             index = items+1; // intentionally set index > items so that the last line in this do-while just does not execute in case there's an exception when converting string to int
             switch (input) {
                 case "d":
-                    if (currentElement.getTagName().equals("dir")) {
-                        System.out.printf("Enter directory name: ");
-                        String folderName = scanner.nextLine();
-                        currentElement.createFolder(passwordDatabase,folderName);
-                        saved = false;
-                    } else {
-                        System.out.printf("Cannot create directory.%n%s is not a folder.",currentElement.getAttribute("name"));
-                    }
+                    System.out.printf("Enter directory name: ");
+                    String folderName = scanner.nextLine();
+                    currentElement.createChild(passwordDatabase,"dir",folderName);
+                    saved = false;
                     break;
                 case "e":
-                    if (currentElement.getTagName().equals("dir")) {
-                        System.out.printf("Enter entry name: ");
-                        String entryName = scanner.nextLine();
-                        currentElement.createEntry(passwordDatabase,entryName);
-                        saved = false;
-                    } else {
-                        System.out.printf("Cannot create entry.%n%s is not a folder.",currentElement.getAttribute("name"));
-                    }
+                    System.out.printf("Enter entry name: ");
+                    String entryName = scanner.nextLine();
+                    currentElement.createChild(passwordDatabase,"entry",entryName);
+                    saved = false;
                     break;
                 case "del":
                     System.out.printf("Enter index to delete: ");
@@ -549,7 +541,7 @@ public class Main {
                     System.out.printf("Enter new name for the file: ");
                     String newFileName = scanner.nextLine();
                     String base64EncodedFile = Base64.getEncoder().encodeToString(fileBytes);
-                    fileElement = currentElement.createFile(passwordDatabase,newFileName);
+                    fileElement = currentElement.createChild(passwordDatabase,"file",newFileName);
                     fileElement.inputText(passwordDatabase,base64EncodedFile);
                     saved = false;
                     break;

@@ -71,45 +71,28 @@ public class pxmlElement {
         return new pxmlElement(childElement);
     }
 
-    public pxmlElement createFolder(Document passwordDataBase, String newFolderName) {
+    public pxmlElement createChild(Document passwordDatabase, String childType, String childName) {
         Element folder = this.element;
-        if (!folder.getTagName().equals("dir")){
-            System.err.println("Failed to create folder inside"+folder.getAttribute("name")+". "+folder.getAttribute("name")+" is not a folder.");
-            return new pxmlElement(folder);
+        String[] childFields = null;
+        switch (childType) {
+            case "entry":
+                childFields = new String[]{"user","password","URL","TOTP","notes"};
+                break;
+            case "card":
+                childFields = new String[]{"number","name","expiration","cvv"};
+                break;
         }
-        Element newFolder = passwordDataBase.createElement("dir");
-        newFolder.setAttribute("name",newFolderName);
-        folder.appendChild(newFolder);
-        return new pxmlElement(newFolder);
-    }
-
-    public pxmlElement createFile(Document passwordDataBase, String newFileName) {
-        Element folder = this.element;
-        if (!folder.getTagName().equals("dir")){
-            System.err.println("Failed to create file inside"+folder.getAttribute("name")+". "+folder.getAttribute("name")+" is not a folder.");
-            return new pxmlElement(folder);
+        Element child = passwordDatabase.createElement(childType);
+        child.setAttribute("name",childName);
+        folder.appendChild(child);
+        if (childFields != null) {
+            for (int i=0; i<childFields.length; i++) {
+                Element newField = passwordDatabase.createElement("field");
+                newField.setAttribute("name",childFields[i]);
+                child.appendChild(newField);
+            }
         }
-        Element newFile = passwordDataBase.createElement("file");
-        newFile.setAttribute("name",newFileName);
-        folder.appendChild(newFile);
-        return new pxmlElement(newFile);
-    }
-
-    public pxmlElement createEntry(Document passwordDatabase, String newEntryName) {
-        Element folder = this.element;
-        if (!folder.getTagName().equals("dir")){
-            System.err.println("Failed to create folder inside"+folder.getAttribute("name")+". "+folder.getAttribute("name")+" is not a folder.");
-            return new pxmlElement(folder);
-        }
-        Element newEntry = passwordDatabase.createElement("entry");
-        newEntry.setAttribute("name",newEntryName);
-        folder.appendChild(newEntry);
-        for (int i=0; i<entryFields.length; i++) {
-            Element newField = passwordDatabase.createElement("field");
-            newField.setAttribute("name",entryFields[i]);
-            newEntry.appendChild(newField);
-        }
-        return new pxmlElement(newEntry);
+        return new pxmlElement(child);
     }
 
     public void deleteItem(int index) {
