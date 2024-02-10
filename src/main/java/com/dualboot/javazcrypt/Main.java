@@ -204,40 +204,6 @@ public class Main {
         scanner.close();
     }
 
-    private static boolean fileExists(String file) {
-        Path filePath = Paths.get(file);
-        if (Files.exists(filePath)) {
-            return true;
-        }
-        return false;
-    }
-
-    private static boolean isRegularFile(String file) {
-        Path filePath = Paths.get(file);
-        if (Files.exists(filePath) && Files.isRegularFile(filePath)) {
-            return true;
-        }
-        return false;
-    }
-
-    private static Document openDatabase() {
-        try {
-            byte[] decryptedBytes = CryptOps.decryptFile(inputFile, password,keyFile);
-            Document passwordDatabase = ContentManager.convertByteArrayToXMLDocument(decryptedBytes);
-            System.out.println("Database opened successfuly.");
-            try {
-                timeInterval = Integer.parseInt(passwordDatabase.getDocumentElement().getAttribute("timeInterval"))*1000; // convert to milisseconds
-            } catch (NumberFormatException e) {
-                message = "Could not get clipboard time interval from settings. Using default.";
-            }
-            // ContentManager.printBytes(decryptedBytes);
-            return passwordDatabase;
-        } catch (Exception e) {
-            System.out.println("Error opening database");
-            return null;
-        }
-    }
-
     private static Document createDatabase() {
         try {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -258,141 +224,22 @@ public class Main {
         }
     }
 
-    // private static Element secondaryMenu(Document passwordDatabase, Element currentElement, String input, Deque pathQ) {
-    private static pxmlElement secondaryMenu(Document passwordDatabase,pxmlElement currentElement) {
-        String input = null;
-        int items;
-        int index;
-        String mode = "copy";
-        do {
-            if (message != null) {
-                System.out.println(message);
-                message = null;
-                fillWidth("=");
+    private static Document openDatabase() {
+        try {
+            byte[] decryptedBytes = CryptOps.decryptFile(inputFile, password,keyFile);
+            Document passwordDatabase = ContentManager.convertByteArrayToXMLDocument(decryptedBytes);
+            System.out.println("Database opened successfuly.");
+            try {
+                timeInterval = Integer.parseInt(passwordDatabase.getDocumentElement().getAttribute("timeInterval"))*1000; // convert to milisseconds
+            } catch (NumberFormatException e) {
+                message = "Could not get clipboard time interval from settings. Using default.";
             }
-            // display
-            switch (mode) {
-                case "copy":
-                    System.out.printf("selected mode: (c) copy%nenter (e) for edit mode%n");
-                    break;
-                case "edit":
-                    System.out.printf("selected mode: (e) edit%nenter (c) for copy mode%n");
-                    break;
-            }
-            fillWidth("=");
-            System.out.printf("Path: /");
-            for (int i=0; i<pathQ.size(); i++) {
-                System.out.printf("%s/",pathL.get(pathQ.size()-1-i));
-            }
-            System.out.println();
-            fillWidth("=");
-            System.out.println();
-            items = currentElement.listChildElements(true);
-            System.out.println();
-            fillWidth("=");
-            String[] options0 = {" number - select field "," g - generate password "," w - write to file "};
-            String[] options1 = {" 0 or .. - close entry ","                       ","     q - quit      "};
-            if (currentElement.getTagName().equals("card")) {
-                options0[1] = "";
-                options1[1] = ""; // case of card = no password
-            }
-            displayMenu(options0);
-            displayMenu(options1);
-            fillWidth("=");
-            System.out.printf("Enter menu option: ");
-            // switch-case
-            input = scanner.nextLine();
-            index = items+1; // intentionally set index > items + 1 so that the last line in this do-while just does not execute in case there's an exception when converting string to int
-            switch (input) {
-                case "c":
-                    mode = "copy";
-                    break;
-                case "e":
-                    mode = "edit";
-                    break;
-                case "w":
-                    saveFile(passwordDatabase);
-                    break;
-                case "..":
-                case "0":
-                    Node parentNode = currentElement.getParentNode();
-                    if (parentNode != null && parentNode.getNodeType() == Node.ELEMENT_NODE) {
-                        Element tempElement = (Element) parentNode;
-                        currentElement = new pxmlElement(tempElement);
-                        pathQ.pop();
-                        clearScreen(); // needed here while not in the mainMenu because of return statement below
-                        return currentElement;
-                    }
-                    break;
-                case "g":
-                    if (currentElement.getTagName().equals("card")) break;
-                    String[] allPasswordElements = {"qwertyuiopasdfghjklçzxcvbnm","QWERTYUIOPASDFGHJKLÇZXCVBNM","0123456789","!@#$%¨&*()_-+=`´[]{}~^;:.><","¬¹²³£¢§°®ŧ←↓→øþ´ªæßðđŋħˀĸł´ºˇ«»©„“”µ•·̣"}; // NO ALPHABETICAL ORDER, DEAL WITH IT      
-                    for (int i=0; i<allPasswordElements.length; i++) {
-                        System.out.println((i+1)+") "+allPasswordElements[i]);
-                    }
-                    System.out.printf("Enter the indexes of elements you want in your password: ");
-                    input = scanner.nextLine();
-                    String chosenPasswordsElements = "";
-                    for (int i=0; i<allPasswordElements.length; i++) {
-                        if(input.contains(String.valueOf(i+1))) {
-                            chosenPasswordsElements += allPasswordElements[i];
-                        }
-                    }
-                    System.out.printf("Enter desired password length: ");
-                    input = scanner.nextLine();
-                    try {
-                        int length = Integer.parseInt(input);
-                        String entryPassword = generatePassword(length,chosenPasswordsElements);
-                        Text textNode = passwordDatabase.createTextNode(entryPassword);
-                        currentElement.getChildElement(ContentManager.passwordIndex).deleteTextContent(); // passwordEntry = 1
-                        currentElement.getChildElement(ContentManager.passwordIndex).appendChild(textNode);
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                case "q":
-                    exitProgram = true;
-                default:
-                    try {
-                        index = Integer.parseInt(input);
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace();
-                    }
-                    if (index <= items && index >= 1) {
-                        if (mode.equals("edit")) {
-                            LineReader lineReader = LineReaderBuilder.builder().terminal(terminal).build();
-                            pxmlElement field = currentElement.getChildElement(index-1);
-                            String text = null;
-                            if (field.getAttribute("name").equals("TOTP")) {
-                                text = lineReader.readLine("Edit "+field.getAttribute("name")+" secret key: ",null,field.getTextContent());
-                            } else {
-                                text = lineReader.readLine("Edit "+field.getAttribute("name")+": ",null,field.getTextContent());
-                            }
-                            Text textNode = passwordDatabase.createTextNode(text);
-                            // delete old node first, otherwise the statement below will just append.
-                            field.deleteTextContent();
-                            field.appendChild(textNode);
-                        } else {
-                            pxmlElement field = currentElement.getChildElement(index-1);
-                            String text = field.getTextContent();
-                            if (field.getAttribute("name").equals("TOTP")) {
-                                if (field.getTextContent().length() > 0) {
-                                    text = TOTP.getCode(field.getTextContent());
-                                }
-                            }
-                            ContentManager.copyToClipboard(text);
-                            timer.schedule(new TimerTask() {
-                                @Override
-                                public void run() {
-                                    ContentManager.copyToClipboard(null);
-                                }
-                            }, timeInterval); // run in 10k milisseconds
-                        }
-                    }
-            }
-            clearScreen();
-        } while (!exitProgram);
-        return null;
+            // ContentManager.printBytes(decryptedBytes);
+            return passwordDatabase;
+        } catch (Exception e) {
+            System.out.println("Error opening database");
+            return null;
+        }
     }
 
     private static pxmlElement mainMenu(Document passwordDatabase,pxmlElement currentElement) {
@@ -601,17 +448,140 @@ public class Main {
         return null;
     }
 
-    private static void saveFile(Document passwordDatabase) {
-        try {
-            byte[] decryptedBytes = ContentManager.convertXMLDocumentToByteArray(passwordDatabase);
-            byte[] encryptedBytes = CryptOps.encryptBytes(decryptedBytes,password,keyFile);
-            ContentManager.writeBytesToFile(inputFile,encryptedBytes);
-            System.out.println("Content successfully written to file!");
-            saved = true;
-            } catch (Exception e) {
-                message = "Could not write content to file.";
-                e.printStackTrace();
-        }
+    private static pxmlElement secondaryMenu(Document passwordDatabase,pxmlElement currentElement) {
+        String input = null;
+        int items;
+        int index;
+        String mode = "copy";
+        do {
+            if (message != null) {
+                System.out.println(message);
+                message = null;
+                fillWidth("=");
+            }
+            // display
+            switch (mode) {
+                case "copy":
+                    System.out.printf("selected mode: (c) copy%nenter (e) for edit mode%n");
+                    break;
+                case "edit":
+                    System.out.printf("selected mode: (e) edit%nenter (c) for copy mode%n");
+                    break;
+            }
+            fillWidth("=");
+            System.out.printf("Path: /");
+            for (int i=0; i<pathQ.size(); i++) {
+                System.out.printf("%s/",pathL.get(pathQ.size()-1-i));
+            }
+            System.out.println();
+            fillWidth("=");
+            System.out.println();
+            items = currentElement.listChildElements(true);
+            System.out.println();
+            fillWidth("=");
+            String[] options0 = {" number - select field "," g - generate password "," w - write to file "};
+            String[] options1 = {" 0 or .. - close entry ","                       ","     q - quit      "};
+            if (currentElement.getTagName().equals("card")) {
+                options0[1] = "";
+                options1[1] = ""; // case of card = no password
+            }
+            displayMenu(options0);
+            displayMenu(options1);
+            fillWidth("=");
+            System.out.printf("Enter menu option: ");
+            // switch-case
+            input = scanner.nextLine();
+            index = items+1; // intentionally set index > items + 1 so that the last line in this do-while just does not execute in case there's an exception when converting string to int
+            switch (input) {
+                case "c":
+                    mode = "copy";
+                    break;
+                case "e":
+                    mode = "edit";
+                    break;
+                case "w":
+                    saveFile(passwordDatabase);
+                    break;
+                case "..":
+                case "0":
+                    Node parentNode = currentElement.getParentNode();
+                    if (parentNode != null && parentNode.getNodeType() == Node.ELEMENT_NODE) {
+                        Element tempElement = (Element) parentNode;
+                        currentElement = new pxmlElement(tempElement);
+                        pathQ.pop();
+                        clearScreen(); // needed here while not in the mainMenu because of return statement below
+                        return currentElement;
+                    }
+                    break;
+                case "g":
+                    if (currentElement.getTagName().equals("card")) break;
+                    String[] allPasswordElements = {"qwertyuiopasdfghjklçzxcvbnm","QWERTYUIOPASDFGHJKLÇZXCVBNM","0123456789","!@#$%¨&*()_-+=`´[]{}~^;:.><","¬¹²³£¢§°®ŧ←↓→øþ´ªæßðđŋħˀĸł´ºˇ«»©„“”µ•·̣"}; // NO ALPHABETICAL ORDER, DEAL WITH IT      
+                    for (int i=0; i<allPasswordElements.length; i++) {
+                        System.out.println((i+1)+") "+allPasswordElements[i]);
+                    }
+                    System.out.printf("Enter the indexes of elements you want in your password: ");
+                    input = scanner.nextLine();
+                    String chosenPasswordsElements = "";
+                    for (int i=0; i<allPasswordElements.length; i++) {
+                        if(input.contains(String.valueOf(i+1))) {
+                            chosenPasswordsElements += allPasswordElements[i];
+                        }
+                    }
+                    System.out.printf("Enter desired password length: ");
+                    input = scanner.nextLine();
+                    try {
+                        int length = Integer.parseInt(input);
+                        String entryPassword = generatePassword(length,chosenPasswordsElements);
+                        Text textNode = passwordDatabase.createTextNode(entryPassword);
+                        currentElement.getChildElement(ContentManager.passwordIndex).deleteTextContent(); // passwordEntry = 1
+                        currentElement.getChildElement(ContentManager.passwordIndex).appendChild(textNode);
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case "q":
+                    exitProgram = true;
+                default:
+                    try {
+                        index = Integer.parseInt(input);
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
+                    if (index <= items && index >= 1) {
+                        if (mode.equals("edit")) {
+                            LineReader lineReader = LineReaderBuilder.builder().terminal(terminal).build();
+                            pxmlElement field = currentElement.getChildElement(index-1);
+                            String text = null;
+                            if (field.getAttribute("name").equals("TOTP")) {
+                                text = lineReader.readLine("Edit "+field.getAttribute("name")+" secret key: ",null,field.getTextContent());
+                            } else {
+                                text = lineReader.readLine("Edit "+field.getAttribute("name")+": ",null,field.getTextContent());
+                            }
+                            Text textNode = passwordDatabase.createTextNode(text);
+                            // delete old node first, otherwise the statement below will just append.
+                            field.deleteTextContent();
+                            field.appendChild(textNode);
+                        } else {
+                            pxmlElement field = currentElement.getChildElement(index-1);
+                            String text = field.getTextContent();
+                            if (field.getAttribute("name").equals("TOTP")) {
+                                if (field.getTextContent().length() > 0) {
+                                    text = TOTP.getCode(field.getTextContent());
+                                }
+                            }
+                            ContentManager.copyToClipboard(text);
+                            timer.schedule(new TimerTask() {
+                                @Override
+                                public void run() {
+                                    ContentManager.copyToClipboard(null);
+                                }
+                            }, timeInterval); // run in 10k milisseconds
+                        }
+                    }
+            }
+            clearScreen();
+        } while (!exitProgram);
+        return null;
     }
 
     private static void settingsMenu(Document passwordDatabase) {
@@ -660,49 +630,17 @@ public class Main {
         }
     }
 
-    private static void displayMenu(String[] options) {
-        int terminalWidth;
-        if (terminal == null) terminalWidth = 0;
-        terminalWidth = terminal.getWidth();
-        int menuLength = 0;
-        for (int i=0; i<options.length; i++) {
-            menuLength += options[i].length();
-        }
-        int spacing = 0;
-        if (terminalWidth > menuLength) {
-            spacing = (terminalWidth-menuLength)/(options.length+1);
-        }
-        for (int i=0; i<options.length; i++) {
-            for (int j=0; j<spacing; j++) {
-                    System.out.printf(" ");
-            }
-            System.out.printf("%s",options[i]);
-        }
-        System.out.printf("%n");
-    }
-
-    private static void fillWidth(String filling) {
-        if (terminal == null) return;
-        int repeat = terminal.getWidth()/filling.length();
-        for (int i=0; i<repeat; i++) {
-            System.out.printf(filling);
-        }
-        System.out.printf("%n");
-    }
-
-    private static Terminal getTerminal() {
+    private static void saveFile(Document passwordDatabase) {
         try {
-            Terminal terminal = TerminalBuilder.builder().build();
-            return terminal;
-        } catch (Exception e) {
-            return null;
+            byte[] decryptedBytes = ContentManager.convertXMLDocumentToByteArray(passwordDatabase);
+            byte[] encryptedBytes = CryptOps.encryptBytes(decryptedBytes,password,keyFile);
+            ContentManager.writeBytesToFile(inputFile,encryptedBytes);
+            System.out.println("Content successfully written to file!");
+            saved = true;
+            } catch (Exception e) {
+                message = "Could not write content to file.";
+                e.printStackTrace();
         }
-    }
-
-    private static void clearScreen() {
-        // ANSI escape code to clear the screen
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
     }
 
     private static String generatePassword(int length, String possibleCharacters) {
@@ -739,6 +677,67 @@ public class Main {
         clearScreen();
         System.out.println("Password set successfully!");
         // }
+    }
+
+    private static boolean fileExists(String file) {
+        Path filePath = Paths.get(file);
+        if (Files.exists(filePath)) {
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean isRegularFile(String file) {
+        Path filePath = Paths.get(file);
+        if (Files.exists(filePath) && Files.isRegularFile(filePath)) {
+            return true;
+        }
+        return false;
+    }
+
+    private static Terminal getTerminal() {
+        try {
+            Terminal terminal = TerminalBuilder.builder().build();
+            return terminal;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static void displayMenu(String[] options) {
+        int terminalWidth;
+        if (terminal == null) terminalWidth = 0;
+        terminalWidth = terminal.getWidth();
+        int menuLength = 0;
+        for (int i=0; i<options.length; i++) {
+            menuLength += options[i].length();
+        }
+        int spacing = 0;
+        if (terminalWidth > menuLength) {
+            spacing = (terminalWidth-menuLength)/(options.length+1);
+        }
+        for (int i=0; i<options.length; i++) {
+            for (int j=0; j<spacing; j++) {
+                    System.out.printf(" ");
+            }
+            System.out.printf("%s",options[i]);
+        }
+        System.out.printf("%n");
+    }
+
+    private static void fillWidth(String filling) {
+        if (terminal == null) return;
+        int repeat = terminal.getWidth()/filling.length();
+        for (int i=0; i<repeat; i++) {
+            System.out.printf(filling);
+        }
+        System.out.printf("%n");
+    }
+
+    private static void clearScreen() {
+        // ANSI escape code to clear the screen
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
     }
 
     private static void help() {
