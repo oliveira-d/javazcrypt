@@ -108,7 +108,6 @@ public class pxmlElement {
         folder.removeChild(childElement);
     }
 
-
     public void inputText(Document passwordDataBase, String newText) {
         Element field = this.element;
         if (!field.getTagName().equals("field") && !field.getTagName().equals("file")) {
