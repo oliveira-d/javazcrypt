@@ -50,7 +50,7 @@ public class Main {
     private static String inputFile = null;
     private static String outputFile = null;
     private static Terminal terminal = getTerminal();
-    private static pxmlElement clipboardElement = null; // leave it to the class so that is doesn't lose itself when switching between mainMenu() and entryMenu()
+    private static pxmlElement clipboardElement = null; // leave it to the class so that is doesn't lose itself when switching between mainMenu() and secondaryMenu()
     private static boolean saved = true;
     private static Scanner scanner = new Scanner(System.in);
     private static Timer timer = null; // do not initialize timer here. For operations other than manipulating the database the timer won't be canceled and program will hang instead of quitting
@@ -187,7 +187,7 @@ public class Main {
         do {
             currentElement = mainMenu(passwordDatabase,currentElement);
             if (currentElement != null) {
-                currentElement = entryMenu(passwordDatabase,currentElement);
+                currentElement = secondaryMenu(passwordDatabase,currentElement);
             }
         } while (currentElement != null);
         timer.cancel();
@@ -250,8 +250,8 @@ public class Main {
         }
     }
 
-    // private static Element entryMenu(Document passwordDatabase, Element currentElement, String input, Deque pathQ) {
-    private static pxmlElement entryMenu(Document passwordDatabase,pxmlElement currentElement) {
+    // private static Element secondaryMenu(Document passwordDatabase, Element currentElement, String input, Deque pathQ) {
+    private static pxmlElement secondaryMenu(Document passwordDatabase,pxmlElement currentElement) {
         String input = null;
         int items;
         int index;
@@ -284,6 +284,7 @@ public class Main {
             fillWidth("=");
             String[] options0 = {" number - select field ","   e - edit mode   ","  c - copy mode  "};
             String[] options1 = {" g - generate password "," w - write to file "," 0 - close entry "};
+            if (currentElement.getTagName().equals("card")) options1[0] = "                       "; // case of card = no password
             displayMenu(options0);
             displayMenu(options1);
             fillWidth("=");
@@ -313,6 +314,7 @@ public class Main {
                     }
                     break;
                 case "g":
+                    if (currentElement.getTagName().equals("card")) break;
                     String[] allPasswordElements = {"qwertyuiopasdfghjklçzxcvbnm","QWERTYUIOPASDFGHJKLÇZXCVBNM","0123456789","!@#$%¨&*()_-+=`´[]{}~^;:.><","¬¹²³£¢§°®ŧ←↓→øþ´ªæßðđŋħˀĸł´ºˇ«»©„“”µ•·̣"}; // NO ALPHABETICAL ORDER, DEAL WITH IT      
                     for (int i=0; i<allPasswordElements.length; i++) {
                         System.out.println((i+1)+") "+allPasswordElements[i]);
@@ -433,6 +435,12 @@ public class Main {
                     System.out.printf("Enter entry name: ");
                     String entryName = scanner.nextLine();
                     currentElement.createChild(passwordDatabase,"entry",entryName);
+                    saved = false;
+                    break;
+                case "c":
+                    System.out.printf("Enter credit card name: ");
+                    String cardName = scanner.nextLine();
+                    currentElement.createChild(passwordDatabase,"card",cardName);
                     saved = false;
                     break;
                 case "del":
@@ -584,7 +592,7 @@ public class Main {
                         if (currentElement.getChildElement(index-1).getTagName().equals("file")) break;
                         currentElement = currentElement.getChildElement(index-1);
                         pathQ.push(currentElement.getAttribute("name"));
-                        if (currentElement.getTagName().equals("entry")){
+                        if (currentElement.getTagName().equals("entry") || currentElement.getTagName().equals("card")){
                             clearScreen();
                             return currentElement;
                         }

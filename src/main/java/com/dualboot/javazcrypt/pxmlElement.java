@@ -37,6 +37,7 @@ public class pxmlElement {
                 if (showValue) {
                     switch (childElement.getAttribute("name")) {
                         case "password":
+                        case "cvv":
                             System.out.printf(": ");
                             for (int j=0; j<childElement.getTextContent().length(); j++) {
                                 System.out.printf("*");
