@@ -282,9 +282,12 @@ public class Main {
             items = currentElement.listChildElements(true);
             System.out.println();
             fillWidth("=");
-            String[] options0 = {" number - select field ","   e - edit mode   ","  c - copy mode  "};
-            String[] options1 = {" g - generate password "," w - write to file "," 0 - close entry "};
-            if (currentElement.getTagName().equals("card")) options1[0] = "                       "; // case of card = no password
+            String[] options0 = {" number - select field "," g - generate password "," w - write to file "};
+            String[] options1 = {" 0 or .. - close entry ","                       ","     q - quit      "};
+            if (currentElement.getTagName().equals("card")) {
+                options0[1] = "";
+                options1[1] = ""; // case of card = no password
+            }
             displayMenu(options0);
             displayMenu(options1);
             fillWidth("=");
@@ -411,10 +414,10 @@ public class Main {
             items = currentElement.listChildElements(false);
             System.out.println();
             fillWidth("=");
-            String[] options0 = {" d - create directory ","   e - create entry   ","      r - rename      "};
-            String[] options1 = {"  w - write to file   ","   .. or 0 - cd out   ","     del - delete     "};
-            String[] options2 = {"       q - quit       ","  p - change password "," k - change key file  "};
-            String[] options3 = {"      mv - move       ","   if - import file   ","   ef - export file   "};
+            String[] options0 = {" d - add directory ","   e - add entry  "," c - add credit card "};
+            String[] options1 = {"  r - rename item  ","  mv - move item  ","     del - delete    "};
+            String[] options2 = {"  if - import file "," ef - export file ","  w - write to file  "};
+            String[] options3 = {"  .. or 0 - cd out ","   s - settings   ","       q - quit      "};
             displayMenu(options0);
             displayMenu(options1);
             displayMenu(options2);
@@ -487,26 +490,33 @@ public class Main {
                         saved = false;
                     }
                     break;
-                case "p":
-                    changePassword();
-                    break;
-                case "k":
-                    lineReader = LineReaderBuilder.builder().terminal(terminal).completer(new FileNameCompleter()).build();
-                    keyFile = lineReader.readLine("Enter path to key file: ");
-                    while (keyFile.endsWith(" ")) {
-                        // Remove the space using substring to avoid exception - this space may occur when completing with tab
-                        keyFile = keyFile.substring(0, keyFile.length() - 1);
+                case "s":
+                    System.out.printf("Enter (p) to change password or (k) to change key file: ");
+                    input = scanner.nextLine();
+                    switch (input) {
+                        case "p":
+                            changePassword();
+                            break;
+                        case "k":
+                            lineReader = LineReaderBuilder.builder().terminal(terminal).completer(new FileNameCompleter()).build();
+                            keyFile = lineReader.readLine("Enter path to key file: ");
+                            while (keyFile.endsWith(" ")) {
+                                // Remove the space using substring to avoid exception - this space may occur when completing with tab
+                                keyFile = keyFile.substring(0, keyFile.length() - 1);
+                            }
+                            if (fileExists(keyFile) && isRegularFile(keyFile)) {
+                                if (!Files.isReadable(FileSystems.getDefault().getPath(keyFile))) {
+                                    message = "Cannot read key file "+keyFile;
+                                    keyFile = null;
+                                }
+                                saved = false;
+                            } else {
+                                message = "Cannot find key file"+keyFile;
+                                keyFile = null;
+                            }
+                            break;
                     }
-                    if (fileExists(keyFile) && isRegularFile(keyFile)) {
-                        if (!Files.isReadable(FileSystems.getDefault().getPath(keyFile))) {
-                            message = "Cannot read key file "+keyFile;
-                            keyFile = null;
-                        }
-                        saved = false;
-                    } else {
-                        message = "Cannot find key file"+keyFile;
-                        keyFile = null;
-                    }
+                    saved = false;
                     break;
                 case "mv":
                     if (clipboardElement == null) {
