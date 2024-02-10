@@ -60,10 +60,6 @@ public class Main {
 
     public static void main(String[] args) {
 
-        if (args.length == 0) {
-            System.err.println("No arguments were provided.\nDisplaying help."); help(); return;
-        }
-
         String operation = "open";
 
         for (int i = 0; i < args.length; i++) {
@@ -114,8 +110,11 @@ public class Main {
 
         if (inputFile == null) {
             System.err.println("No database specified.");
-            System.exit(1);
-        } else if (!fileExists(inputFile)) {
+            LineReader lineReader = LineReaderBuilder.builder().terminal(terminal).completer(new FileNameCompleter()).build();
+            inputFile = lineReader.readLine("Enter the path for an existing database or create a new one: ");
+        }
+
+        if (!fileExists(inputFile)) {
             operation="create";
             System.out.println("Database not found. Creating new.");
         } else if (!isRegularFile(inputFile)) {
