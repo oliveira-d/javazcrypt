@@ -54,6 +54,7 @@ public class Main {
     private static boolean saved = true;
     private static Scanner scanner = new Scanner(System.in);
     private static Timer timer = null; // do not initialize timer here. For operations other than manipulating the database the timer won't be canceled and program will hang instead of quitting
+    private static int timeInterval = 10000; // default time interval to clear clipboard - may be changed in the open database function
     private static String message = null;
     private static boolean exitProgram = false;
 
@@ -224,6 +225,11 @@ public class Main {
             byte[] decryptedBytes = CryptOps.decryptFile(inputFile, password,keyFile);
             Document passwordDatabase = ContentManager.convertByteArrayToXMLDocument(decryptedBytes);
             System.out.println("Database opened successfuly.");
+            try {
+                timeInterval = Integer.parseInt(passwordDatabase.getDocumentElement().getAttribute("timeInterval"))*1000; // convert to milisseconds
+            } catch (NumberFormatException e) {
+                message = "Could not get clipboard time interval from settings. Using default.";
+            }
             // ContentManager.printBytes(decryptedBytes);
             return passwordDatabase;
         } catch (Exception e) {
@@ -239,6 +245,7 @@ public class Main {
             Document passwordDatabase = documentBuilder.newDocument();
             Element rootElement = passwordDatabase.createElement("dir");
             rootElement.setAttribute("name","root");
+            rootElement.setAttribute("timeInterval","10"); //set time interval in seconds
             passwordDatabase.appendChild(rootElement);
             byte[] decryptedBytes = ContentManager.convertXMLDocumentToByteArray(passwordDatabase);
             byte[] encryptedBytes = CryptOps.encryptBytes(decryptedBytes,password,keyFile);
@@ -379,7 +386,7 @@ public class Main {
                                 public void run() {
                                     ContentManager.copyToClipboard(null);
                                 }
-                            }, 10000); // run in 10k milisseconds
+                            }, timeInterval); // run in 10k milisseconds
                         }
                     }
             }
@@ -495,31 +502,8 @@ public class Main {
                     }
                     break;
                 case "s":
-                    System.out.printf("Enter (p) to change password or (k) to change key file: ");
-                    input = scanner.nextLine();
-                    switch (input) {
-                        case "p":
-                            changePassword();
-                            break;
-                        case "k":
-                            lineReader = LineReaderBuilder.builder().terminal(terminal).completer(new FileNameCompleter()).build();
-                            keyFile = lineReader.readLine("Enter path to key file: ");
-                            while (keyFile.endsWith(" ")) {
-                                // Remove the space using substring to avoid exception - this space may occur when completing with tab
-                                keyFile = keyFile.substring(0, keyFile.length() - 1);
-                            }
-                            if (fileExists(keyFile) && isRegularFile(keyFile)) {
-                                if (!Files.isReadable(FileSystems.getDefault().getPath(keyFile))) {
-                                    message = "Cannot read key file "+keyFile;
-                                    keyFile = null;
-                                }
-                                saved = false;
-                            } else {
-                                message = "Cannot find key file"+keyFile;
-                                keyFile = null;
-                            }
-                            break;
-                    }
+                    clearScreen();
+                    settingsMenu(passwordDatabase);
                     saved = false;
                     break;
                 case "mv":
@@ -627,6 +611,52 @@ public class Main {
             } catch (Exception e) {
                 message = "Could not write content to file.";
                 e.printStackTrace();
+        }
+    }
+
+    private static void settingsMenu(Document passwordDatabase) {
+        fillWidth("=");
+        System.out.println();
+        System.out.println("(p) change password");
+        System.out.println("(k) change key file");
+        System.out.println("(t) change time interval to clear clipboard");
+        System.out.println();
+        fillWidth("=");
+        System.out.printf("Enter an option: ");
+        String input = scanner.nextLine();
+        LineReader lineReader = LineReaderBuilder.builder().terminal(terminal).build();
+        switch (input) {
+            case "p":
+                changePassword();
+                break;
+            case "k":
+                lineReader = LineReaderBuilder.builder().terminal(terminal).completer(new FileNameCompleter()).build();
+                keyFile = lineReader.readLine("Enter path to key file: ");
+                while (keyFile.endsWith(" ")) {
+                    // Remove the space using substring to avoid exception - this space may occur when completing with tab
+                    keyFile = keyFile.substring(0, keyFile.length() - 1);
+                }
+                if (fileExists(keyFile) && isRegularFile(keyFile)) {
+                    if (!Files.isReadable(FileSystems.getDefault().getPath(keyFile))) {
+                        message = "Cannot read key file "+keyFile;
+                        keyFile = null;
+                    }
+                    saved = false;
+                } else {
+                    message = "Cannot find key file"+keyFile;
+                    keyFile = null;
+                }
+                break;
+            case "t":
+                String timer = lineReader.readLine("Input time interval (seconds): ",null,passwordDatabase.getDocumentElement().getAttribute("timeInterval"));
+                try {
+                    int milisseconds = Integer.parseInt(timer);
+                    timer = String.valueOf(milisseconds);
+                    passwordDatabase.getDocumentElement().setAttribute("timeInterval",timer);
+                } catch (NumberFormatException e) {
+                    message = "Timer was not updated. Input was not a number.";
+                }
+                break;
         }
     }
 
