@@ -753,7 +753,7 @@ public class Main {
         -d, --decrypt      Decrypt file.
         -e, --encrypt      Encrypt file.
         -o <output_file>   Specify output file when encrypting or decrypting. 
-                        If no output file is specified file will be edited in place.
+                           If no output file is specified file will be edited in place.
 
         If neither decryption or encryption operation is specified, 
         javazcrypt will try to open or create a password database.
