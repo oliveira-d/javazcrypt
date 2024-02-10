@@ -55,6 +55,7 @@ public class Main {
     private static Scanner scanner = new Scanner(System.in);
     private static Timer timer = null; // do not initialize timer here. For operations other than manipulating the database the timer won't be canceled and program will hang instead of quitting
     private static String message = null;
+    private static boolean exitProgram = false;
 
     public static void main(String[] args) {
 
@@ -342,6 +343,8 @@ public class Main {
                         e.printStackTrace();
                     }
                     break;
+                case "q":
+                    exitProgram = true;
                 default:
                     try {
                         index = Integer.parseInt(input);
@@ -381,7 +384,7 @@ public class Main {
                     }
             }
             clearScreen();
-        } while (!input.equals("q"));
+        } while (!exitProgram);
         return null;
     }
 
@@ -460,6 +463,7 @@ public class Main {
                     }
                     break;
                 case "q":
+                    exitProgram = true;
                     break;
                 case "w":
                     saveFile(passwordDatabase);
@@ -609,7 +613,7 @@ public class Main {
                     }
             }
             clearScreen();
-        } while (!input.equals("q"));
+        } while (!exitProgram);
         return null;
     }
 
