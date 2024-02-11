@@ -3,6 +3,7 @@ package com.dualboot.javazcrypt;
 import java.io.Console;
 import java.util.Scanner;
 
+// keep track of path inside "xml filesystem"
 import java.util.LinkedList;
 import java.util.Deque;
 
@@ -14,9 +15,10 @@ import java.nio.file.Paths;
 // check is file is readable/writable
 import java.nio.file.FileSystems;
 
+// encoding to store files in xml
 import java.util.Base64;
 
-// dont know which ones are needed
+// xml document
 import java.io.IOException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
