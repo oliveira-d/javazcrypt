@@ -109,9 +109,8 @@ public class Main {
         }
 
         if (inputFile == null) {
-            System.err.println("No database specified.");
             LineReader lineReader = LineReaderBuilder.builder().terminal(terminal).completer(new FileNameCompleter()).build();
-            inputFile = lineReader.readLine("Enter the path for an existing database or create a new one: ");
+            inputFile = lineReader.readLine("No database specified. Enter the path for an existing database or create a new one: ");
         }
 
         if (!fileExists(inputFile)) {
@@ -195,7 +194,7 @@ public class Main {
         ContentManager.copyToClipboard(null); // clear clipboard in case the timer hasn't gotten to do so
 
         if(!saved) {
-            System.out.printf("There are changes not saved to the file. Would you like to write to disk? (y/n): ");
+            System.out.printf("Database has been modified. Would you like to save the changes? (y/n): ");
             String answer = scanner.nextLine();
             answer = answer.toLowerCase();
             if (answer.equals("y") || answer.equals("yes")) saveFile(passwordDatabase);
@@ -272,7 +271,7 @@ public class Main {
             fillWidth("=");
             String[] options0 = {" d - add directory ","   e - add entry  "," c - add credit card "};
             String[] options1 = {"  r - rename item  ","  mv - move item  ","     del - delete    "};
-            String[] options2 = {"  if - import file "," ef - export file ","  w - write to file  "};
+            String[] options2 = {"  if - import file "," ef - export file ","     w - write out   "};
             String[] options3 = {"  .. or 0 - cd out ","   s - settings   ","       q - quit      "};
             displayMenu(options0);
             displayMenu(options1);
