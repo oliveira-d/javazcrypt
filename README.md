@@ -1,8 +1,18 @@
-# Javazcrypt
+# javazcrypt
 
 Simple command-line password manager and file encryption utility.
 
-Build it with Maven using this command in the project's folder:
+Build it with Gradle. Open a terminal in the project's folder and, on unix-like systems, execute this command:
+```
+sh gradlew build
+```
+On Windows, execute this command:
+```
+gradlew.bat build
+```
+Note: on Windows you need to set the %JAVA_HOME% environment variable. To find what the %JAVA_HOME% should be, With JDK installed, execute the command "where javac". The output will be %JAVA_HOME%\bin\javac.exe
+
+Alternatively, you can build it with Maven. With Maven installed, execute the following command:
 ```
 mvn package
 ```
