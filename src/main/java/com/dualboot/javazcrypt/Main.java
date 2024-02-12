@@ -1,4 +1,4 @@
-package com.dualboot.javazcrypt;
+package com.github.oliveiradd.javazcrypt;
 
 import java.io.Console;
 import java.util.Scanner;

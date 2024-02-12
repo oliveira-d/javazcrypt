@@ -1,4 +1,4 @@
-package com.dualboot.javazcrypt;
+package com.github.oliveiradd.javazcrypt;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package com.dualboot.javazcrypt;
+package com.github.oliveiradd.javazcrypt;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

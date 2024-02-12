@@ -18,7 +18,7 @@ dependencies {
     api("org.jline:jline-reader:3.25.1")
 }
 
-group = "com.dualboot.javazcrypt"
+group = "com.github.oliveiradd.javazcrypt"
 version = "1.0.0"
 description = "javazcrypt"
 java.sourceCompatibility = JavaVersion.VERSION_17
@@ -33,7 +33,7 @@ tasks.withType<Javadoc>() {
 
 tasks.jar {
     manifest {
-        attributes["Main-Class"] = "com.dualboot.javazcrypt.Main"
+        attributes["Main-Class"] = "com.github.oliveiradd.javazcrypt.Main"
     }
 }
 

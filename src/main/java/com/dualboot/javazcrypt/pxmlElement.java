@@ -1,4 +1,4 @@
-package com.dualboot.javazcrypt;
+package com.github.oliveiradd.javazcrypt;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
