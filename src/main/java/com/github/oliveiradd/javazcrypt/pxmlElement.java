@@ -39,7 +39,14 @@ public class pxmlElement {
                         case "TOTP":
                             if (childElement.getTextContent().length() > 0) {
                                 String totp = TOTP.getCode(childElement.getTextContent());
-                                System.out.printf(": %s",totp);
+                                if (hideSensitiveValues) {
+                                    System.out.printf(": ");
+                                    for (int j=0; j<totp.length(); j++) {
+                                        System.out.printf("*");
+                                    }
+                                } else {
+                                    System.out.printf(": %s",totp);
+                                }
                             } else {
                                 System.out.printf(":");
                             }
