@@ -268,7 +268,7 @@ public class Main {
             fillWidth("=");
             System.out.println();
             //display main menu
-            items = currentElement.listChildElements(false);
+            items = currentElement.listChildElements(false,false);
             System.out.println();
             fillWidth("=");
             String[] options0 = {" d - add directory ","   e - add entry  "," c - add credit card "};
@@ -453,6 +453,7 @@ public class Main {
         int items;
         int index;
         String mode = "copy";
+        boolean hideSensitiveValues = true;
         do {
             if (message != null) {
                 System.out.println(message);
@@ -476,11 +477,11 @@ public class Main {
             System.out.println();
             fillWidth("=");
             System.out.println();
-            items = currentElement.listChildElements(true);
+            items = currentElement.listChildElements(true,hideSensitiveValues);
             System.out.println();
             fillWidth("=");
             String[] options0 = {" number - select field "," g - generate password "," w - write to file "};
-            String[] options1 = {" 0 or .. - close entry ","                       ","     q - quit      "};
+            String[] options1 = {" 0 or .. - close entry "," v - toggle visibility ","     q - quit      "};
             if (currentElement.getTagName().equals("card")) {
                 options0[1] = "";
                 options1[1] = ""; // case of card = no password
@@ -541,6 +542,8 @@ public class Main {
                     break;
                 case "q":
                     exitProgram = true;
+                case "v":
+                    hideSensitiveValues = !hideSensitiveValues;
                 default:
                     try {
                         index = Integer.parseInt(input);

@@ -23,7 +23,7 @@ public class pxmlElement {
 
     // methods to list stuff
 
-    public int listChildElements(boolean showValue) {
+    public int listChildElements(boolean showValue, boolean hideSensitiveValues) {
         // System.out.println("Child elements of " + parentElement.getTagName() + ":");
         Element folder = this.element;
         NodeList childNodes = folder.getChildNodes();
@@ -36,13 +36,6 @@ public class pxmlElement {
                 System.out.printf("(%-"+7+"s (%d) %s",childElement.getTagName()+")",i+1,childElement.getAttribute("name"));
                 if (showValue) {
                     switch (childElement.getAttribute("name")) {
-                        case "password":
-                        case "cvv":
-                            System.out.printf(": ");
-                            for (int j=0; j<childElement.getTextContent().length(); j++) {
-                                System.out.printf("*");
-                            }
-                            break;
                         case "TOTP":
                             if (childElement.getTextContent().length() > 0) {
                                 String totp = TOTP.getCode(childElement.getTextContent());
@@ -51,6 +44,15 @@ public class pxmlElement {
                                 System.out.printf(":");
                             }
                             break;
+                        case "password":
+                        case "cvv":
+                            if (hideSensitiveValues) {
+                                System.out.printf(": ");
+                                for (int j=0; j<childElement.getTextContent().length(); j++) {
+                                    System.out.printf("*");
+                                }
+                                break; // intentionally only break if code executes. otherwise execute default case
+                            }
                         default:
                             System.out.printf(": %s",childElement.getTextContent());                      
                     }
