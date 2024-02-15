@@ -57,7 +57,7 @@ public class Main {
     private static Scanner scanner = new Scanner(System.in);
     private static Timer timer = null; // do not initialize timer here. For operations other than manipulating the database the timer won't be canceled and program will hang instead of quitting
     private static int timeInterval = 10000; // default time interval to clear clipboard - may be changed in the open database function
-    private static String message = null;
+    static String message = null;
     private static boolean exitProgram = false;
 
     public static void main(String[] args) {

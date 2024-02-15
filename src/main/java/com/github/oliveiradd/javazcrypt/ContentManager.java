@@ -2,6 +2,7 @@ package com.github.oliveiradd.javazcrypt;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.awt.HeadlessException;
 
 // file checking
 import java.nio.file.Files;
@@ -64,9 +65,13 @@ public class ContentManager {
     }
 
     public static void copyToClipboard(String text) {
-        Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
-        Clipboard clipboard = defaultToolkit.getSystemClipboard();
-        clipboard.setContents(new StringSelection(text), null);
+        try {
+            Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
+            Clipboard clipboard = defaultToolkit.getSystemClipboard();
+            clipboard.setContents(new StringSelection(text), null);
+        } catch (HeadlessException e) {
+            Main.message = "Cannot use clipboard. Running on headless system.";
+        }
     }
 
     public static String encodeBase64(String file) {
