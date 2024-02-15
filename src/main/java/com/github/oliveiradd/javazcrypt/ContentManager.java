@@ -28,24 +28,24 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 
-public class ContentManager {
+class ContentManager {
 
     private static String[] entryFields = {"user","password","URL","TOTP","notes"};
-    public static int passwordIndex = 1;
+    static int passwordIndex = 1;
 
-    public static void writeBytesToFile(String outputFile, byte[] outputBytes) throws IOException {
+    static void writeBytesToFile(String outputFile, byte[] outputBytes) throws IOException {
         try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
             outputStream.write(outputBytes);
         }
     }
     //methods to manage XML file in memory
 
-    public static void printBytes(byte[] decryptedBytes) {
+    static void printBytes(byte[] decryptedBytes) {
         String decryptedContent = new String(decryptedBytes, StandardCharsets.UTF_8);
         System.out.printf("%s",decryptedContent);
     }
 
-    public static byte[] convertXMLDocumentToByteArray(Document xmlDocument) throws Exception {
+    static byte[] convertXMLDocumentToByteArray(Document xmlDocument) throws Exception {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();
 
@@ -56,7 +56,7 @@ public class ContentManager {
         return outputStream.toByteArray();
     }
 
-    public static Document convertByteArrayToXMLDocument(byte[] byteArray) throws Exception {
+    static Document convertByteArrayToXMLDocument(byte[] byteArray) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(byteArray);
@@ -64,7 +64,7 @@ public class ContentManager {
         return builder.parse(inputStream);
     }
 
-    public static void copyToClipboard(String text) {
+    static void copyToClipboard(String text) {
         try {
             Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
             Clipboard clipboard = defaultToolkit.getSystemClipboard();
@@ -74,7 +74,7 @@ public class ContentManager {
         }
     }
 
-    public static String encodeBase64(String file) {
+    static String encodeBase64(String file) {
         try {
             byte[] inputFileBytes = Files.readAllBytes(Paths.get(file));
             String base64EncodedFile = Base64.getEncoder().encodeToString(inputFileBytes);
@@ -85,7 +85,7 @@ public class ContentManager {
         return null;
     }
 
-    public static void outputEncodedFile(pxmlElement currentElement,String outputFile) {
+    static void outputEncodedFile(pxmlElement currentElement,String outputFile) {
         String encodedFile = currentElement.getTextContent();
         byte[] decodedData = Base64.getDecoder().decode(encodedFile);
         try {

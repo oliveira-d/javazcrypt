@@ -9,12 +9,12 @@ import java.time.Instant;
 
 import org.apache.commons.codec.binary.Base32;
 
-public class TOTP {
+class TOTP {
     
     private static final int TOTP_INTERVAL_SECONDS = 30; // Time step in seconds
     private static final int TOTP_DIGITS = 6;
 
-    public static String getCode(String secretKeyBase32) {
+    static String getCode(String secretKeyBase32) {
         long counter = getCurrentTimeStep();
         byte[] counterBytes = ByteBuffer.allocate(8).putLong(counter).array();
 

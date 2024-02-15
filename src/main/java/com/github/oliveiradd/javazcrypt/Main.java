@@ -43,7 +43,7 @@ import java.security.SecureRandom;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Main {
+class Main {
 
     private static LinkedList<String> pathL = new LinkedList<>();
     private static Deque<String> pathQ = pathL;
@@ -60,7 +60,7 @@ public class Main {
     static String message = null;
     private static boolean exitProgram = false;
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
 
         String operation = "open";
 

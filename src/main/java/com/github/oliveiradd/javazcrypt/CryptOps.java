@@ -12,12 +12,12 @@ import java.security.Key;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class CryptOps {
+class CryptOps {
 
     private static final String ALGORITHM = "AES";
     private static final String TRANSFORMATION = "AES/ECB/PKCS5Padding";
 
-    public static byte[] encryptFile(String inputFile, String password, String keyFile) throws Exception {
+    static byte[] encryptFile(String inputFile, String password, String keyFile) throws Exception {
         
         Key key = generateKey(password,keyFile);
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);
@@ -30,7 +30,7 @@ public class CryptOps {
         return encryptedBytes;
     }
 
-    public static byte[] encryptBytes(byte[] inputFileBytes, String password, String keyFile) throws Exception {
+    static byte[] encryptBytes(byte[] inputFileBytes, String password, String keyFile) throws Exception {
         Key key = generateKey(password,keyFile);
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);
         cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -38,7 +38,7 @@ public class CryptOps {
         return encryptedBytes;
     }
 
-    public static byte[] decryptFile(String inputFile, String password, String keyFile) throws Exception {
+    static byte[] decryptFile(String inputFile, String password, String keyFile) throws Exception {
         Key key = generateKey(password,keyFile);
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);
         cipher.init(Cipher.DECRYPT_MODE, key);

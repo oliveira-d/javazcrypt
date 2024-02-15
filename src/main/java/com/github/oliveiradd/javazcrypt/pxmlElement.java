@@ -6,24 +6,24 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 import org.w3c.dom.NodeList;
 
-public class pxmlElement {
+class pxmlElement {
 
     private Element element;
     private static String[] entryFields = {"user","password","URL","TOTP","notes"};
     // private static Document passwordDatabase; 
 
-    public pxmlElement(Document passwordDatabase) {
+    pxmlElement(Document passwordDatabase) {
         this.element = passwordDatabase.getDocumentElement();
     }
 
-    public pxmlElement(Element element) {
+    pxmlElement(Element element) {
         this.element = element;
     }
 
 
     // methods to list stuff
 
-    public int displayChildElements(boolean showValue, boolean hideSensitiveValues) {
+    int displayChildElements(boolean showValue, boolean hideSensitiveValues) {
         // System.out.println("Child elements of " + parentElement.getTagName() + ":");
         Element folder = this.element;
         NodeList childNodes = folder.getChildNodes();
@@ -71,7 +71,7 @@ public class pxmlElement {
         return childNodes.getLength();
     }
     
-    public pxmlElement getChildElement(int index) {
+    pxmlElement getChildElement(int index) {
         Element folder = this.element;
             // System.out.println("Child elements of " + parentElement.getTagName() + ":");
         NodeList childNodes = folder.getChildNodes();
@@ -81,7 +81,7 @@ public class pxmlElement {
         return new pxmlElement(childElement);
     }
 
-    public pxmlElement createChild(Document passwordDatabase, String childType, String childName) {
+    pxmlElement createChild(Document passwordDatabase, String childType, String childName) {
         Element folder = this.element;
         String[] childFields = null;
         switch (childType) {
@@ -105,7 +105,7 @@ public class pxmlElement {
         return new pxmlElement(child);
     }
 
-    public void deleteItem(int index) {
+    void deleteItem(int index) {
         Element folder = this.element;
         if (!folder.getTagName().equals("dir")){
             System.err.println("Failed to create item inside"+folder.getAttribute("name")+". "+folder.getAttribute("name")+" is not a folder.");
@@ -117,7 +117,7 @@ public class pxmlElement {
         folder.removeChild(childElement);
     }
 
-    public void inputText(Document passwordDataBase, String newText) {
+    void inputText(Document passwordDataBase, String newText) {
         Element field = this.element;
         if (!field.getTagName().equals("field") && !field.getTagName().equals("file")) {
             System.err.println("Failed to write text to item. "+field.getAttribute("name")+" is not an input field or a file.");
@@ -126,7 +126,7 @@ public class pxmlElement {
         field.appendChild(passwordDataBase.createTextNode(newText));
     }
 
-    public void deleteTextContent() {
+    void deleteTextContent() {
         Element field = this.element;
         // Get the list of child nodes
         Node child = field.getFirstChild();
@@ -140,35 +140,35 @@ public class pxmlElement {
         }
     }
 
-    public void setAttribute(String key,String value) {
+    void setAttribute(String key,String value) {
         this.element.setAttribute(key,value);
     }
 
-    public Node getParentNode() {
+    Node getParentNode() {
         return this.element.getParentNode();
     }
 
-    public void appendChild(Text textNode) {
+    void appendChild(Text textNode) {
         this.element.appendChild(textNode);
     }
 
-    public void appendChild(pxmlElement childElement) {
+    void appendChild(pxmlElement childElement) {
         this.element.appendChild(childElement.element);
     }
 
-    public String getTextContent() {
+    String getTextContent() {
         return this.element.getTextContent();
     }
 
-    public String getTagName() {
+    String getTagName() {
         return this.element.getTagName();
     }
 
-    public String getAttribute(String key) {
+    String getAttribute(String key) {
         return this.element.getAttribute(key);
     }
 
-    public Element getElement() {
+    Element getElement() {
         return this.element;
     }
 
