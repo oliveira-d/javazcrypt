@@ -23,7 +23,7 @@ public class pxmlElement {
 
     // methods to list stuff
 
-    public int listChildElements(boolean showValue, boolean hideSensitiveValues) {
+    public int displayChildElements(boolean showValue, boolean hideSensitiveValues) {
         // System.out.println("Child elements of " + parentElement.getTagName() + ":");
         Element folder = this.element;
         NodeList childNodes = folder.getChildNodes();

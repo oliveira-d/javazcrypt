@@ -268,7 +268,7 @@ public class Main {
             fillWidth("=");
             System.out.println();
             //display main menu
-            items = currentElement.listChildElements(false,false);
+            items = currentElement.displayChildElements(false,false);
             System.out.println();
             fillWidth("=");
             String[] options0 = {" d - add directory ","   e - add entry  "," c - add credit card "};
@@ -477,7 +477,7 @@ public class Main {
             System.out.println();
             fillWidth("=");
             System.out.println();
-            items = currentElement.listChildElements(true,hideSensitiveValues);
+            items = currentElement.displayChildElements(true,hideSensitiveValues);
             System.out.println();
             fillWidth("=");
             String[] options0 = {" number - select field "," g - generate password "," w - write to file "};
