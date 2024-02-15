@@ -34,7 +34,7 @@ import org.jline.terminal.TerminalBuilder;
 // autocompletion
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
-import org.jline.reader.impl.completer.FileNameCompleter; // Import FileNameCompleter from correct package
+import org.jline.builtins.Completers.FileNameCompleter;
 
 // generate passwd
 import java.security.SecureRandom;

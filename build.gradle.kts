@@ -16,6 +16,7 @@ dependencies {
     api("commons-codec:commons-codec:1.16.0")
     api("org.jline:jline-terminal-jna:3.25.1")
     api("org.jline:jline-reader:3.25.1")
+    api("org.jline:jline-builtins:3.25.1")
 }
 
 group = "com.github.oliveiradd.javazcrypt"
