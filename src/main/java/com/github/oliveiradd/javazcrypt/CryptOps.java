@@ -59,7 +59,7 @@ class CryptOps {
         } else {
             passwordSalt = Files.readAllBytes(Paths.get(keyFile));
         }
-        KeySpec spec = new PBEKeySpec(password.toCharArray(), passwordSalt, 65536, 256); // 256 bits is the maximum key size hehe
+        KeySpec spec = new PBEKeySpec(password.toCharArray(), passwordSalt, 1048576, 256); // 256 bits is the maximum key size hehe
         SecretKey tmp = factory.generateSecret(spec);
         return new SecretKeySpec(tmp.getEncoded(), ALGORITHM);
     }
