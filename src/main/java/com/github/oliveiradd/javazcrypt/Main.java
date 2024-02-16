@@ -111,23 +111,35 @@ class Main {
         }
 
         if (inputFile == null) {
-            LineReader lineReader = LineReaderBuilder.builder().terminal(terminal).completer(new FileNameCompleter()).build();
-            inputFile = lineReader.readLine("No database specified. Enter the path for an existing database or create a new one: ");
+            if (operation.equals("open")) {
+                LineReader lineReader = LineReaderBuilder.builder().terminal(terminal).completer(new FileNameCompleter()).build();
+                inputFile = lineReader.readLine("No database specified. Enter the path for an existing database or create a new one: ");
+            } else { // operation is encrypt or decrypt
+                System.err.println("No input file specified.");
+                System.exit(1);
+            }
         }
 
         if (!fileExists(inputFile)) {
-            operation="create";
-            System.out.println("Database not found. Creating new.");
+            if (operation.equals("open")) {
+                operation="create";
+                System.out.println("Database not found. Creating new.");
+            } else {
+                System.err.println("Input file does not exist.");
+                System.exit(1);
+            }
         } else if (!isRegularFile(inputFile)) {
-            System.err.printf("Cannot open database. %s is not a regular file.%nExiting.%n",inputFile);
+            System.err.printf("Cannot open file. %s is not a regular file.%nExiting.%n",inputFile);
             System.exit(1);
         }
 
-        if (outputFile == null) {
-            outputFile = inputFile;
-        } else if (fileExists(outputFile)) {
-            System.err.println("File already exists. Will not overwrite.");
-            System.exit(1);
+        if (operation.equals("encrypt") || operation.equals("decrypt")) {
+            if (outputFile == null) {
+                outputFile = inputFile;
+            } else if (fileExists(outputFile)) {
+                System.err.println("File already exists. Will not overwrite.");
+                System.exit(1);
+            }
         }
 
         if (keyFile != null) {
