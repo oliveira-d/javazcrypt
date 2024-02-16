@@ -66,24 +66,6 @@ class Main {
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
-                // arguments for the password manager
-                case "-k":
-                    if (i < args.length - 1) {
-                        keyFile = args[++i]; // ++i - Move to the next argument - keyfile path won't serve in switch case anyway
-                    } else {
-                        System.out.println("Missing key file.");
-                        System.exit(1);
-                    }
-                    break;
-                case "-c":
-                case "--create":
-                    operation = "create";
-                    if (i < args.length -1) {
-                        inputFile = args[++i];
-                    } else {
-                        System.err.println("Missing database name.");
-                    }
-                    break;
                 // file encryption utility arguments
                 case "-e":
                 case "--encrypt":
@@ -99,6 +81,15 @@ class Main {
                         outputFile = args[++i];
                     } else {
                         System.err.println("Missing output file.");
+                    }
+                    break;
+                // general arguments
+                case "-k":
+                    if (i < args.length - 1) {
+                        keyFile = args[++i]; // ++i - Move to the next argument - keyfile path won't serve in switch case anyway
+                    } else {
+                        System.out.println("Missing key file.");
+                        System.exit(1);
                     }
                     break;
                 case "-h":
