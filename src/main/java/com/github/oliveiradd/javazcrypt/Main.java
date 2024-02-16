@@ -60,7 +60,7 @@ class Main {
     static String message = null;
     private static boolean exitProgram = false;
 
-    static void main(String[] args) {
+    public static void main(String[] args) {
 
         String operation = "open";
 
