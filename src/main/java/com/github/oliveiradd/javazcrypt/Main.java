@@ -12,9 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-// check is file is readable/writable
-import java.nio.file.FileSystems;
-
 // encoding to store files in xml
 import java.util.Base64;
 
@@ -111,31 +108,40 @@ class Main {
             }
         }
 
-        if (!fileExists(inputFile)) {
+        if (!Files.exists(Paths.get(inputFile))) {
             if (operation.equals("open")) {
                 operation="create";
                 System.out.println("Database not found. Creating new.");
             } else {
-                System.err.println("Input file does not exist.");
+                System.err.printf("Cannot open '%s': file does not exist.%n",inputFile);
                 System.exit(1);
             }
-        } else if (!isRegularFile(inputFile)) {
-            System.err.printf("Cannot open file. %s is not a regular file.%nExiting.%n",inputFile);
+        } else if (!Files.isReadable(Paths.get(inputFile))) {
+            System.err.printf("Cannot open '%s': no read permission.%n",inputFile);
+            System.exit(1);
+        } else if (!Files.isRegularFile(Paths.get(inputFile))) {
+            System.err.printf("Cannot open '%s': not a regular file.%n",inputFile);
             System.exit(1);
         }
 
         if (operation.equals("encrypt") || operation.equals("decrypt")) {
             if (outputFile == null) {
                 outputFile = inputFile;
-            } else if (fileExists(outputFile)) {
-                System.err.println("File already exists. Will not overwrite.");
+            } else if (!Files.exists(Paths.get(outputFile))) {
+                System.err.printf("'%s' already exists. Will not overwrite.%n",outputFile);
                 System.exit(1);
             }
         }
 
         if (keyFile != null) {
-            if (!fileExists(keyFile)) {
-                System.err.printf("Could not find key file %s%nExiting.%n",keyFile);
+            if (!Files.exists(Paths.get(keyFile))) {
+                System.err.printf("Cannot open '%s': file does not exist.%n",keyFile);
+                System.exit(1);
+            } else if (!Files.isReadable(Paths.get(keyFile))) {
+                System.err.printf("Cannot open '%s': no read permission.%n",keyFile);
+                System.exit(1);
+            } else if (!Files.isRegularFile(Paths.get(keyFile))) {
+                System.err.printf("Cannot open '%s': not a regular file.%n",keyFile);
                 System.exit(1);
             }
         }
@@ -379,12 +385,15 @@ class Main {
                         // Remove the space using substring to avoid exception - this space may occur when completing with tab
                         importedFile = importedFile.substring(0, importedFile.length() - 1);
                     }
-                    if (!isRegularFile(importedFile)) {
-                        message = "Cannot import file: "+importedFile+" is not a regular file.";
+                    if (!Files.exists(Paths.get(importedFile))) {
+                        message = "Cannot import '"+importedFile+"': file does not exist.";
+                    }
+                    if (!Files.isReadable(Paths.get(importedFile))){
+                        message = "Cannot import '"+importedFile+"': no read permission.";
                         break;
                     }
-                    if (!Files.isReadable(FileSystems.getDefault().getPath(importedFile))){
-                        message = "Cannot import file: "+importedFile+" is not readable.";
+                    if (!Files.isRegularFile(Paths.get(importedFile))) {
+                        message = "Cannot import '"+importedFile+"': not a regular file.";
                         break;
                     }
                     byte[] fileBytes = null; // compiler complains if i don't initialize it
@@ -612,15 +621,17 @@ class Main {
                     // Remove the space using substring to avoid exception - this space may occur when completing with tab
                     keyFile = keyFile.substring(0, keyFile.length() - 1);
                 }
-                if (fileExists(keyFile) && isRegularFile(keyFile)) {
-                    if (!Files.isReadable(FileSystems.getDefault().getPath(keyFile))) {
-                        message = "Cannot read key file "+keyFile;
-                        keyFile = null;
-                    }
-                    saved = false;
-                } else {
-                    message = "Cannot find key file"+keyFile;
+                if (!Files.exists(Paths.get(keyFile))) {
+                    message = "Cannot open '"+keyFile+"': files does not exist.";
                     keyFile = null;
+                } else if (!Files.isReadable(Paths.get(keyFile))) {
+                    message = "Cannot open '"+keyFile+"': no read permission.";
+                    keyFile = null;
+                } else if (!Files.isRegularFile(Paths.get(keyFile))) {
+                    message = "Cannot open '"+keyFile+"': not a regular file.";
+                    keyFile = null;
+                } else {
+                    saved = false; // keyFile updated in memory
                 }
                 break;
             case "t":
@@ -683,22 +694,6 @@ class Main {
         clearScreen();
         System.out.println("Password set successfully!");
         // }
-    }
-
-    private static boolean fileExists(String file) {
-        Path filePath = Paths.get(file);
-        if (Files.exists(filePath)) {
-            return true;
-        }
-        return false;
-    }
-
-    private static boolean isRegularFile(String file) {
-        Path filePath = Paths.get(file);
-        if (Files.exists(filePath) && Files.isRegularFile(filePath)) {
-            return true;
-        }
-        return false;
     }
 
     private static Terminal getTerminal() {
