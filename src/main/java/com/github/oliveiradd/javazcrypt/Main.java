@@ -147,21 +147,7 @@ class Main {
         }
 
         // get password
-        Console console = System.console();
-        char[] passwordChars = null;
-        if (operation.equals("open") || operation.equals("decrypt")) {
-            passwordChars = console.readPassword("Enter your password: ");
-            password = new String(passwordChars);
-        } else { // if (operation.equals("encrypt") || operation.equals("create"))
-            String password2 = null;
-            do {
-                passwordChars = console.readPassword("Enter a password to encrypt the file: ");
-                password = new String(passwordChars);
-                passwordChars = console.readPassword("Confirm your password: ");
-                password2 = new String(passwordChars);
-                if (!password2.equals(password)) System.out.println("Passwords do not match. Try again.");
-            } while (!password2.equals(password));
-        }
+        password = getPassword(operation);
         
         Document passwordDatabase = null;
         switch (operation) {
@@ -668,26 +654,28 @@ class Main {
         return stringBuilder.toString();
     }
 
-    private static void changePassword() {
+    private static String getPassword(String operation) {
         Console console = System.console();
-        char[] oldPasswordChars = console.readPassword("Enter current password: ");
-        String oldPassword = new String(oldPasswordChars);
-        if (oldPassword.equals("..")) return;
-        char[] newPasswordChars;
-        char[] newPasswordChars2;
-        String newPassword;
-        String newPassword2;        
-        // if (oldPassword.equals(password)) {
-        do {
-            newPasswordChars = console.readPassword("Enter new password: ");
-            newPassword = new String(newPasswordChars);
-            if (newPassword.equals("..")) return;
-            newPasswordChars2 = console.readPassword("Confirm password: ");
-            newPassword2 = new String(newPasswordChars2);
-            if (newPassword2.equals("..")) return;
-            if (!newPassword2.equals(newPassword)) System.err.println("Passwords do not match. Try again.");
-        } while (!newPassword2.equals(newPassword));
-        password = newPassword;
+        char[] passwordChars = null;
+        if (operation.equals("open") || operation.equals("decrypt")) {
+            passwordChars = console.readPassword("Enter your password: ");
+            password = new String(passwordChars);
+        } else { // if (operation.equals("encrypt") || operation.equals("create"))
+            String password2 = null;
+            do {
+                passwordChars = console.readPassword("Enter a password to encrypt the file: ");
+                password = new String(passwordChars);
+                passwordChars = console.readPassword("Confirm your password: ");
+                password2 = new String(passwordChars);
+                if (!password2.equals(password)) System.out.println("Passwords do not match. Try again.");
+                if (password2.equals("") && keyFile == null) System.out.println("Password cannot be empty when no key file is being used. Try again.");
+            } while (!password2.equals(password) || (password2.equals("") && keyFile == null));
+        }
+        return password;
+    }
+
+    private static void changePassword() {
+        password = getPassword("encrypt");
         clearScreen();
         System.out.println("Password set successfully!");
         // }
