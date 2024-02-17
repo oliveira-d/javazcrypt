@@ -387,29 +387,25 @@ class Main {
                     }
                     if (!Files.exists(Paths.get(importedFile))) {
                         message = "Cannot import '"+importedFile+"': file does not exist.";
-                        break;
-                    }
-                    if (!Files.isReadable(Paths.get(importedFile))){
+                    } else if (!Files.isReadable(Paths.get(importedFile))) {
                         message = "Cannot import '"+importedFile+"': no read permission.";
-                        break;
-                    }
-                    if (!Files.isRegularFile(Paths.get(importedFile))) {
+                    } else if (!Files.isRegularFile(Paths.get(importedFile))) {
                         message = "Cannot import '"+importedFile+"': not a regular file.";
-                        break;
+                    } else {
+                        byte[] fileBytes = null; // compiler complains if i don't initialize it
+                        try {
+                            fileBytes = Files.readAllBytes(Paths.get(importedFile));
+                        } catch (IOException e) {
+                            message = "Could not open file "+importedFile;
+                            break;
+                        }
+                        System.out.printf("Enter new name for the file: ");
+                        String newFileName = scanner.nextLine();
+                        String base64EncodedFile = Base64.getEncoder().encodeToString(fileBytes);
+                        fileElement = currentElement.createChild(passwordDatabase,"file",newFileName);
+                        fileElement.inputText(passwordDatabase,base64EncodedFile);
+                        saved = false;
                     }
-                    byte[] fileBytes = null; // compiler complains if i don't initialize it
-                    try {
-                        fileBytes = Files.readAllBytes(Paths.get(importedFile));
-                    } catch (IOException e) {
-                        message = "Could not open file "+importedFile;
-                        break;
-                    }
-                    System.out.printf("Enter new name for the file: ");
-                    String newFileName = scanner.nextLine();
-                    String base64EncodedFile = Base64.getEncoder().encodeToString(fileBytes);
-                    fileElement = currentElement.createChild(passwordDatabase,"file",newFileName);
-                    fileElement.inputText(passwordDatabase,base64EncodedFile);
-                    saved = false;
                     break;
                 case "ef":
                     System.out.printf("Enter index of the file you want to output: ");
