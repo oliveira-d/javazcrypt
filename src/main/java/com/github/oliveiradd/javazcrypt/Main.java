@@ -346,7 +346,6 @@ class Main {
                 case "s":
                     clearScreen();
                     settingsMenu(passwordDatabase);
-                    saved = false;
                     break;
                 case "mv":
                     if (clipboardElement == null) {
@@ -599,21 +598,25 @@ class Main {
                 break;
             case "k":
                 lineReader = LineReaderBuilder.builder().terminal(terminal).completer(new FileNameCompleter()).build();
-                keyFile = lineReader.readLine("Enter path to key file: ");
-                while (keyFile.endsWith(" ")) {
+                String newKeyFile = lineReader.readLine("Enter path to new key file: ");
+                while (newKeyFile.endsWith(" ")) {
                     // Remove the space using substring to avoid exception - this space may occur when completing with tab
-                    keyFile = keyFile.substring(0, keyFile.length() - 1);
+                    newKeyFile = newKeyFile.substring(0, newKeyFile.length() - 1);
                 }
-                if (!Files.exists(Paths.get(keyFile))) {
+                if (newKeyFile.equals("")) {
+                    if (password.equals("")) {
+                        message = "Key file cannot be null when password is empty.";
+                    } else {
+                        keyFile = null;
+                    }
+                } else if (!Files.exists(Paths.get(keyFile))) {
                     message = "Cannot open '"+keyFile+"': files does not exist.";
-                    keyFile = null;
                 } else if (!Files.isReadable(Paths.get(keyFile))) {
                     message = "Cannot open '"+keyFile+"': no read permission.";
-                    keyFile = null;
                 } else if (!Files.isRegularFile(Paths.get(keyFile))) {
                     message = "Cannot open '"+keyFile+"': not a regular file.";
-                    keyFile = null;
                 } else {
+                    keyFile = newKeyFile;
                     saved = false; // keyFile updated in memory
                 }
                 break;
@@ -623,6 +626,7 @@ class Main {
                     int milisseconds = Integer.parseInt(timer);
                     timer = String.valueOf(milisseconds);
                     passwordDatabase.getDocumentElement().setAttribute("timeInterval",timer);
+                    saved = false;
                 } catch (NumberFormatException e) {
                     message = "Timer was not updated. Input was not a number.";
                 }
