@@ -387,6 +387,7 @@ class Main {
                     }
                     if (!Files.exists(Paths.get(importedFile))) {
                         message = "Cannot import '"+importedFile+"': file does not exist.";
+                        break;
                     }
                     if (!Files.isReadable(Paths.get(importedFile))){
                         message = "Cannot import '"+importedFile+"': no read permission.";
