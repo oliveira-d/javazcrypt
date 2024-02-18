@@ -1,8 +1,5 @@
 package com.github.oliveiradd.javazcrypt;
 
-import java.io.Console;
-import java.util.Scanner;
-
 // keep track of path inside "xml filesystem"
 import java.util.LinkedList;
 import java.util.Deque;
@@ -28,11 +25,6 @@ import org.w3c.dom.Text;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
-// autocompletion
-import org.jline.reader.LineReader;
-import org.jline.reader.LineReaderBuilder;
-import org.jline.builtins.Completers.FileNameCompleter;
-
 // generate passwd
 import java.security.SecureRandom;
 
@@ -51,7 +43,7 @@ class Main {
     private static Terminal terminal = getTerminal();
     private static pxmlElement clipboardElement = null; // leave it to the class so that is doesn't lose itself when switching between mainMenu() and secondaryMenu()
     private static boolean saved = true;
-    private static Scanner scanner = new Scanner(System.in);
+    private static InputHandler inputHandler = new InputHandler(terminal,15000);
     private static Timer timer = null; // do not initialize timer here. For operations other than manipulating the database the timer won't be canceled and program will hang instead of quitting
     private static int timeInterval = 10000; // default time interval to clear clipboard - may be changed in the open database function
     static String message = null;
@@ -100,8 +92,7 @@ class Main {
 
         if (inputFile == null) {
             if (operation.equals("open")) {
-                LineReader lineReader = LineReaderBuilder.builder().terminal(terminal).completer(new FileNameCompleter()).build();
-                inputFile = lineReader.readLine("No database specified. Enter the path for an existing database or create a new one: ");
+                inputFile = inputHandler.completeLine("No database specified. Enter the path for an existing database or create a new one: ");
             } else { // operation is encrypt or decrypt
                 System.err.println("No input file specified.");
                 System.exit(1);
@@ -192,11 +183,11 @@ class Main {
 
         if(!saved) {
             System.out.printf("Database has been modified. Would you like to save the changes? (y/n): ");
-            String answer = scanner.nextLine();
+            String answer = inputHandler.nextLine();
             answer = answer.toLowerCase();
             if (answer.equals("y") || answer.equals("yes")) saveFile(passwordDatabase);
         }
-        scanner.close();
+        inputHandler.close();
     }
 
     private static Document createDatabase() {
@@ -242,7 +233,6 @@ class Main {
         int items;
         int index;
         pxmlElement fileElement = null;
-        LineReader lineReader = null;
         do {
             if (message != null) {
                 System.out.println(message);
@@ -277,30 +267,30 @@ class Main {
             fillWidth("=");
             System.out.printf("Enter menu option: ");
             // get input and make decisions
-            input = scanner.nextLine();
+            input = inputHandler.nextLine();
             index = items+1; // intentionally set index > items so that the last line in this do-while just does not execute in case there's an exception when converting string to int
             switch (input) {
                 case "d":
                     System.out.printf("Enter directory name: ");
-                    String folderName = scanner.nextLine();
+                    String folderName = inputHandler.nextLine();
                     currentElement.createChild(passwordDatabase,"dir",folderName);
                     saved = false;
                     break;
                 case "e":
                     System.out.printf("Enter entry name: ");
-                    String entryName = scanner.nextLine();
+                    String entryName = inputHandler.nextLine();
                     currentElement.createChild(passwordDatabase,"entry",entryName);
                     saved = false;
                     break;
                 case "c":
                     System.out.printf("Enter credit card name: ");
-                    String cardName = scanner.nextLine();
+                    String cardName = inputHandler.nextLine();
                     currentElement.createChild(passwordDatabase,"card",cardName);
                     saved = false;
                     break;
                 case "del":
                     System.out.printf("Enter index to delete: ");
-                    input = scanner.nextLine();
+                    input = inputHandler.nextLine();
                     try {
                         index = Integer.parseInt(input);
                     } catch (NumberFormatException e) {
@@ -330,7 +320,7 @@ class Main {
                     break;
                 case "r":
                     System.out.printf("Enter index to rename: ");
-                    input = scanner.nextLine();
+                    input = inputHandler.nextLine();
                     try {
                         index = Integer.parseInt(input);
                     } catch (NumberFormatException e) {
@@ -338,7 +328,7 @@ class Main {
                     }
                     if (index <= items && index >= 1) {
                         System.out.printf("Enter new name: ");
-                        String name = scanner.nextLine();
+                        String name = inputHandler.nextLine();
                         currentElement.getChildElement(index-1).setAttribute("name",name);
                         saved = false;
                     }
@@ -350,7 +340,7 @@ class Main {
                 case "mv":
                     if (clipboardElement == null) {
                         System.out.printf("Enter index to move: ");
-                        input = scanner.nextLine();
+                        input = inputHandler.nextLine();
                         try {
                             index = Integer.parseInt(input);
                         } catch (NumberFormatException e) {
@@ -364,8 +354,7 @@ class Main {
                     }
                     break;
                 case "if":
-                    lineReader = LineReaderBuilder.builder().terminal(terminal).completer(new FileNameCompleter()).build();
-                    String importedFile = lineReader.readLine("Enter the path for the file you wish to import to this database: ");
+                    String importedFile = inputHandler.completeLine("Enter the path for the file you wish to import to this database: ");
                     while (importedFile.endsWith(" ")) {
                         // Remove the space using substring to avoid exception - this space may occur when completing with tab
                         importedFile = importedFile.substring(0, importedFile.length() - 1);
@@ -385,7 +374,7 @@ class Main {
                             break;
                         }
                         System.out.printf("Enter new name for the file: ");
-                        String newFileName = scanner.nextLine();
+                        String newFileName = inputHandler.nextLine();
                         String base64EncodedFile = Base64.getEncoder().encodeToString(fileBytes);
                         fileElement = currentElement.createChild(passwordDatabase,"file",newFileName);
                         fileElement.inputText(passwordDatabase,base64EncodedFile);
@@ -394,7 +383,7 @@ class Main {
                     break;
                 case "ef":
                     System.out.printf("Enter index of the file you want to output: ");
-                    input = scanner.nextLine();
+                    input = inputHandler.nextLine();
                     try {
                         index = Integer.parseInt(input);
                     } catch (NumberFormatException e) {
@@ -408,8 +397,7 @@ class Main {
                         }
                         String encodedBytes = fileElement.getTextContent();
                         byte[] decodedBytes = Base64.getDecoder().decode(encodedBytes);
-                        lineReader = LineReaderBuilder.builder().terminal(terminal).completer(new FileNameCompleter()).build();
-                        String outputDecodedFile = lineReader.readLine("Enter file to output data: ");
+                        String outputDecodedFile = inputHandler.completeLine("Enter file to output data: ");
                         while (outputDecodedFile.endsWith(" ")) {
                             // Remove the space using substring to avoid exception
                             outputDecodedFile = outputDecodedFile.substring(0, outputDecodedFile.length() - 1);
@@ -485,7 +473,7 @@ class Main {
             fillWidth("=");
             System.out.printf("Enter menu option: ");
             // switch-case
-            input = scanner.nextLine();
+            input = inputHandler.nextLine();
             index = items+1; // intentionally set index > items + 1 so that the last line in this do-while just does not execute in case there's an exception when converting string to int
             switch (input) {
                 case "c":
@@ -515,7 +503,7 @@ class Main {
                         System.out.println((i+1)+") "+allPasswordElements[i]);
                     }
                     System.out.printf("Enter the indexes of elements you want in your password: ");
-                    input = scanner.nextLine();
+                    input = inputHandler.nextLine();
                     String chosenPasswordsElements = "";
                     for (int i=0; i<allPasswordElements.length; i++) {
                         if(input.contains(String.valueOf(i+1))) {
@@ -523,7 +511,7 @@ class Main {
                         }
                     }
                     System.out.printf("Enter desired password length: ");
-                    input = scanner.nextLine();
+                    input = inputHandler.nextLine();
                     try {
                         int length = Integer.parseInt(input);
                         String entryPassword = generatePassword(length,chosenPasswordsElements);
@@ -546,13 +534,12 @@ class Main {
                     }
                     if (index <= items && index >= 1) {
                         if (mode.equals("edit")) {
-                            LineReader lineReader = LineReaderBuilder.builder().terminal(terminal).build();
                             pxmlElement field = currentElement.getChildElement(index-1);
                             String text = null;
                             if (field.getAttribute("name").equals("TOTP")) {
-                                text = lineReader.readLine("Edit "+field.getAttribute("name")+" secret key: ",null,field.getTextContent());
+                                text = inputHandler.editLine("Edit "+field.getAttribute("name")+" secret key: ",field.getTextContent());
                             } else {
-                                text = lineReader.readLine("Edit "+field.getAttribute("name")+": ",null,field.getTextContent());
+                                text = inputHandler.editLine("Edit "+field.getAttribute("name")+": ",field.getTextContent());
                             }
                             Text textNode = passwordDatabase.createTextNode(text);
                             // delete old node first, otherwise the statement below will just append.
@@ -590,15 +577,13 @@ class Main {
         System.out.println();
         fillWidth("=");
         System.out.printf("Enter an option: ");
-        String input = scanner.nextLine();
-        LineReader lineReader = LineReaderBuilder.builder().terminal(terminal).build();
+        String input = inputHandler.nextLine();
         switch (input) {
             case "p":
                 changePassword();
                 break;
             case "k":
-                lineReader = LineReaderBuilder.builder().terminal(terminal).completer(new FileNameCompleter()).build();
-                String newKeyFile = lineReader.readLine("Enter path to new key file: ");
+                String newKeyFile = inputHandler.completeLine("Enter path to new key file: ");
                 while (newKeyFile.endsWith(" ")) {
                     // Remove the space using substring to avoid exception - this space may occur when completing with tab
                     newKeyFile = newKeyFile.substring(0, newKeyFile.length() - 1);
@@ -621,7 +606,7 @@ class Main {
                 }
                 break;
             case "t":
-                String timer = lineReader.readLine("Input time interval (seconds): ",null,passwordDatabase.getDocumentElement().getAttribute("timeInterval"));
+                String timer = inputHandler.editLine("Input time interval (seconds): ",passwordDatabase.getDocumentElement().getAttribute("timeInterval"));
                 try {
                     int milisseconds = Integer.parseInt(timer);
                     timer = String.valueOf(milisseconds);
@@ -659,18 +644,13 @@ class Main {
     }
 
     private static String getPassword(String operation) {
-        Console console = System.console();
-        char[] passwordChars = null;
         if (operation.equals("open") || operation.equals("decrypt")) {
-            passwordChars = console.readPassword("Enter your password: ");
-            password = new String(passwordChars);
+            password = inputHandler.readPassword("Enter your password: ");
         } else { // if (operation.equals("encrypt") || operation.equals("create"))
             String password2 = null;
             do {
-                passwordChars = console.readPassword("Enter a password to encrypt the file: ");
-                password = new String(passwordChars);
-                passwordChars = console.readPassword("Confirm your password: ");
-                password2 = new String(passwordChars);
+                password = inputHandler.readPassword("Enter a password to encrypt the file: ");
+                password2 = inputHandler.readPassword("Confirm your password: ");
                 if (!password2.equals(password)) System.out.println("Passwords do not match. Try again.");
                 if (password2.equals("") && keyFile == null) System.out.println("Password cannot be empty when no key file is being used. Try again.");
             } while (!password2.equals(password) || (password2.equals("") && keyFile == null));
