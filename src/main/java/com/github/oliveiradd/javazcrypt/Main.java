@@ -43,6 +43,7 @@ class Main {
     private static Terminal terminal = getTerminal();
     private static pxmlElement clipboardElement = null; // leave it to the class so that is doesn't lose itself when switching between mainMenu() and secondaryMenu()
     private static boolean saved = true;
+    private static Document passwordDatabase = null;
 
     private static int inactivityTimeLimit = 120; // seconds
     private static InputHandler inputHandler = new InputHandler(terminal,inactivityTimeLimit);
@@ -144,7 +145,6 @@ class Main {
         // get password
         password = getPassword(operation);
         
-        Document passwordDatabase = null;
         switch (operation) {
             case "open":
                 passwordDatabase = openDatabase();
@@ -177,9 +177,9 @@ class Main {
         clearScreen();
         timer = new Timer(); // timer is only initialized here to avoid the program hanging instead of finishing execution after operations executed previously in the code 
         do {
-            currentElement = mainMenu(passwordDatabase,currentElement);
+            currentElement = mainMenu(currentElement);
             if (currentElement != null) {
-                currentElement = secondaryMenu(passwordDatabase,currentElement);
+                currentElement = secondaryMenu(currentElement);
             }
         } while (currentElement != null);
         timer.cancel();
@@ -189,7 +189,7 @@ class Main {
             System.out.printf("Database has been modified. Would you like to save the changes? (y/n): ");
             String answer = inputHandler.nextLine();
             answer = answer.toLowerCase();
-            if (answer.equals("y") || answer.equals("yes")) saveFile(passwordDatabase);
+            if (answer.equals("y") || answer.equals("yes")) saveFile();
         }
         inputHandler.close();
     }
@@ -238,7 +238,7 @@ class Main {
         }
     }
 
-    private static pxmlElement mainMenu(Document passwordDatabase,pxmlElement currentElement) {
+    private static pxmlElement mainMenu(pxmlElement currentElement) {
         String input = null;
         int items;
         int index;
@@ -315,7 +315,7 @@ class Main {
                     exitProgram = true;
                     break;
                 case "w":
-                    saveFile(passwordDatabase);
+                    saveFile();
                     break;
                 case "0":
                 case "..":
@@ -345,7 +345,7 @@ class Main {
                     break;
                 case "s":
                     clearScreen();
-                    settingsMenu(passwordDatabase);
+                    settingsMenu();
                     break;
                 case "mv":
                     if (clipboardElement == null) {
@@ -440,7 +440,7 @@ class Main {
         return null;
     }
 
-    private static pxmlElement secondaryMenu(Document passwordDatabase,pxmlElement currentElement) {
+    private static pxmlElement secondaryMenu(pxmlElement currentElement) {
         String input = null;
         int items;
         int index;
@@ -493,7 +493,7 @@ class Main {
                     mode = "edit";
                     break;
                 case "w":
-                    saveFile(passwordDatabase);
+                    saveFile();
                     break;
                 case "..":
                 case "0":
@@ -578,7 +578,7 @@ class Main {
         return null;
     }
 
-    private static void settingsMenu(Document passwordDatabase) {
+    private static void settingsMenu() {
         fillWidth("=");
         System.out.println();
         System.out.println("(p) change password");
@@ -629,7 +629,7 @@ class Main {
         }
     }
 
-    private static void saveFile(Document passwordDatabase) {
+    static void saveFile() {
         try {
             byte[] decryptedBytes = ContentManager.convertXMLDocumentToByteArray(passwordDatabase);
             byte[] encryptedBytes = CryptOps.encryptBytes(decryptedBytes,password,keyFile);
