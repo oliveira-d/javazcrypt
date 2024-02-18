@@ -41,6 +41,8 @@ class InputHandler {
         this.timer.schedule(new TimerTask() {
             @Override
             public void run() {
+                System.out.println();
+                Main.clearScreen();
                 System.exit(0);
             }
         }, this.timeInterval); // run in 10k milisseconds        

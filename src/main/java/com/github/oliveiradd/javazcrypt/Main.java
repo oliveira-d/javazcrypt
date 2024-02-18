@@ -228,7 +228,7 @@ class Main {
             try {
                 inactivityTimeLimit = Integer.parseInt(passwordDatabase.getDocumentElement().getAttribute("inactivityTimeLimit"));
             } catch (NumberFormatException e) {
-                message += "%nCould not get inactivity time limit from settings. Using default.";
+                message = "Could not get inactivity time limit from settings. Using default.";
             }
             inputHandler.setInactivityLimit(inactivityTimeLimit);
             return passwordDatabase;
@@ -714,7 +714,7 @@ class Main {
         System.out.printf("%n");
     }
 
-    private static void clearScreen() {
+    static void clearScreen() {
         // ANSI escape code to clear the screen
         System.out.print("\033[H\033[2J");
         System.out.flush();
