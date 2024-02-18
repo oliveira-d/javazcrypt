@@ -285,18 +285,21 @@ class Main {
                     String folderName = inputHandler.nextLine();
                     currentElement.createChild(passwordDatabase,"dir",folderName);
                     saved = false;
+                    autoSave();
                     break;
                 case "e":
                     System.out.printf("Enter entry name: ");
                     String entryName = inputHandler.nextLine();
                     currentElement.createChild(passwordDatabase,"entry",entryName);
                     saved = false;
+                    autoSave();
                     break;
                 case "c":
                     System.out.printf("Enter credit card name: ");
                     String cardName = inputHandler.nextLine();
                     currentElement.createChild(passwordDatabase,"card",cardName);
                     saved = false;
+                    autoSave();
                     break;
                 case "del":
                     System.out.printf("Enter index to delete: ");
@@ -309,6 +312,7 @@ class Main {
                     if (index <= items && index >= 1) {
                         currentElement.deleteItem(index-1);
                         saved = false;
+                        autoSave();
                     }
                     break;
                 case "q":
@@ -341,6 +345,7 @@ class Main {
                         String name = inputHandler.nextLine();
                         currentElement.getChildElement(index-1).setAttribute("name",name);
                         saved = false;
+                        autoSave();
                     }
                     break;
                 case "s":
@@ -361,6 +366,7 @@ class Main {
                         currentElement.appendChild(clipboardElement);
                         clipboardElement = null;
                         saved = false;
+                        autoSave();
                     }
                     break;
                 case "if":
@@ -389,6 +395,7 @@ class Main {
                         fileElement = currentElement.createChild(passwordDatabase,"file",newFileName);
                         fileElement.inputText(passwordDatabase,base64EncodedFile);
                         saved = false;
+                        autoSave();
                     }
                     break;
                 case "ef":
@@ -528,6 +535,8 @@ class Main {
                         Text textNode = passwordDatabase.createTextNode(entryPassword);
                         currentElement.getChildElement(ContentManager.passwordIndex).deleteTextContent(); // passwordEntry = 1
                         currentElement.getChildElement(ContentManager.passwordIndex).appendChild(textNode);
+                        saved = false;
+                        autoSave();
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
@@ -555,6 +564,8 @@ class Main {
                             // delete old node first, otherwise the statement below will just append.
                             field.deleteTextContent();
                             field.appendChild(textNode);
+                            saved = false;
+                            autoSave();
                         } else {
                             pxmlElement field = currentElement.getChildElement(index-1);
                             String text = field.getTextContent();
@@ -613,6 +624,7 @@ class Main {
                 } else {
                     keyFile = newKeyFile;
                     saved = false; // keyFile updated in memory
+                    autoSave();
                 }
                 break;
             case "t":
@@ -622,6 +634,7 @@ class Main {
                     timer = String.valueOf(milisseconds);
                     passwordDatabase.getDocumentElement().setAttribute("clipboardTimeLimit",timer);
                     saved = false;
+                    autoSave();
                 } catch (NumberFormatException e) {
                     message = "Timer was not updated. Input was not a number.";
                 }
@@ -634,12 +647,19 @@ class Main {
             byte[] decryptedBytes = ContentManager.convertXMLDocumentToByteArray(passwordDatabase);
             byte[] encryptedBytes = CryptOps.encryptBytes(decryptedBytes,password,keyFile);
             ContentManager.writeBytesToFile(inputFile,encryptedBytes);
-            System.out.println("Content successfully written to file!");
+            // System.out.println("Content successfully written to file!");
             saved = true;
             } catch (Exception e) {
                 message = "Could not write content to file.";
                 e.printStackTrace();
         }
+    }
+
+    private static void autoSave() {
+        Thread thread = new Thread(() -> {
+            saveFile();
+        });
+        thread.start();
     }
 
     private static String generatePassword(int length, String possibleCharacters) {
@@ -670,6 +690,8 @@ class Main {
 
     private static void changePassword() {
         password = getPassword("encrypt");
+        saved = false;
+        autoSave();
         clearScreen();
         System.out.println("Password set successfully!");
         // }

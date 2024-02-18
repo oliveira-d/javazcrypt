@@ -43,6 +43,7 @@ class InputHandler {
             public void run() {
                 System.out.println();
                 Main.clearScreen();
+                Main.saveFile();
                 System.exit(0);
             }
         }, this.timeInterval); // run in 10k milisseconds        
