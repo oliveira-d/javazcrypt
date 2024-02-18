@@ -43,9 +43,13 @@ class Main {
     private static Terminal terminal = getTerminal();
     private static pxmlElement clipboardElement = null; // leave it to the class so that is doesn't lose itself when switching between mainMenu() and secondaryMenu()
     private static boolean saved = true;
-    private static InputHandler inputHandler = new InputHandler(terminal,15000);
+
+    private static int inactivityTimeLimit = 120; // seconds
+    private static InputHandler inputHandler = new InputHandler(terminal,inactivityTimeLimit);
+
     private static Timer timer = null; // do not initialize timer here. For operations other than manipulating the database the timer won't be canceled and program will hang instead of quitting
-    private static int timeInterval = 10000; // default time interval to clear clipboard - may be changed in the open database function
+    private static int clipboardTimeLimit = 10; // default time interval to clear clipboard (seconds) - may be changed in the open database function
+    
     static String message = null;
     private static boolean exitProgram = false;
 
@@ -197,7 +201,8 @@ class Main {
             Document passwordDatabase = documentBuilder.newDocument();
             Element rootElement = passwordDatabase.createElement("dir");
             rootElement.setAttribute("name","root");
-            rootElement.setAttribute("timeInterval","10"); //set time interval in seconds
+            rootElement.setAttribute("clipboardTimeLimit",String.valueOf(clipboardTimeLimit)); //set time interval in seconds
+            rootElement.setAttribute("inactivityTimeLimit",String.valueOf(inactivityTimeLimit));
             passwordDatabase.appendChild(rootElement);
             byte[] decryptedBytes = ContentManager.convertXMLDocumentToByteArray(passwordDatabase);
             byte[] encryptedBytes = CryptOps.encryptBytes(decryptedBytes,password,keyFile);
@@ -216,11 +221,16 @@ class Main {
             Document passwordDatabase = ContentManager.convertByteArrayToXMLDocument(decryptedBytes);
             System.out.println("Database opened successfuly.");
             try {
-                timeInterval = Integer.parseInt(passwordDatabase.getDocumentElement().getAttribute("timeInterval"))*1000; // convert to milisseconds
+                clipboardTimeLimit = Integer.parseInt(passwordDatabase.getDocumentElement().getAttribute("clipboardTimeLimit")); // convert to milisseconds
             } catch (NumberFormatException e) {
-                message = "Could not get clipboard time interval from settings. Using default.";
+                message = "Could not get clipboard time limit from settings. Using default.";
             }
-            // ContentManager.printBytes(decryptedBytes);
+            try {
+                inactivityTimeLimit = Integer.parseInt(passwordDatabase.getDocumentElement().getAttribute("inactivityTimeLimit"));
+            } catch (NumberFormatException e) {
+                message += "%nCould not get inactivity time limit from settings. Using default.";
+            }
+            inputHandler.setInactivityLimit(inactivityTimeLimit);
             return passwordDatabase;
         } catch (Exception e) {
             System.out.println("Error opening database");
@@ -559,7 +569,7 @@ class Main {
                                 public void run() {
                                     ContentManager.copyToClipboard(null);
                                 }
-                            }, timeInterval); // run in 10k milisseconds
+                            }, clipboardTimeLimit*1000); // run in 10k milisseconds
                         }
                     }
             }
@@ -594,23 +604,23 @@ class Main {
                     } else {
                         keyFile = null;
                     }
-                } else if (!Files.exists(Paths.get(keyFile))) {
-                    message = "Cannot open '"+keyFile+"': files does not exist.";
-                } else if (!Files.isReadable(Paths.get(keyFile))) {
-                    message = "Cannot open '"+keyFile+"': no read permission.";
-                } else if (!Files.isRegularFile(Paths.get(keyFile))) {
-                    message = "Cannot open '"+keyFile+"': not a regular file.";
+                } else if (!Files.exists(Paths.get(newKeyFile))) {
+                    message = "Cannot open '"+newKeyFile+"': files does not exist.";
+                } else if (!Files.isReadable(Paths.get(newKeyFile))) {
+                    message = "Cannot open '"+newKeyFile+"': no read permission.";
+                } else if (!Files.isRegularFile(Paths.get(newKeyFile))) {
+                    message = "Cannot open '"+newKeyFile+"': not a regular file.";
                 } else {
                     keyFile = newKeyFile;
                     saved = false; // keyFile updated in memory
                 }
                 break;
             case "t":
-                String timer = inputHandler.editLine("Input time interval (seconds): ",passwordDatabase.getDocumentElement().getAttribute("timeInterval"));
+                String timer = inputHandler.editLine("Input time interval (seconds): ",passwordDatabase.getDocumentElement().getAttribute("clipboardTimeLimit"));
                 try {
                     int milisseconds = Integer.parseInt(timer);
                     timer = String.valueOf(milisseconds);
-                    passwordDatabase.getDocumentElement().setAttribute("timeInterval",timer);
+                    passwordDatabase.getDocumentElement().setAttribute("clipboardTimeLimit",timer);
                     saved = false;
                 } catch (NumberFormatException e) {
                     message = "Timer was not updated. Input was not a number.";

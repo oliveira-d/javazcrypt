@@ -24,11 +24,16 @@ class InputHandler {
     private LineReader lineEditor = null;
 
     InputHandler(Terminal terminal,int timeInterval) {
-        this.timeInterval = timeInterval;
+        this.timeInterval = timeInterval*1000; // convert to milisseconds
         startTimer();
         scanner = new Scanner(System.in);
         lineCompleter = LineReaderBuilder.builder().terminal(terminal).completer(new FileNameCompleter()).build();
         lineEditor = LineReaderBuilder.builder().terminal(terminal).build();
+    }
+
+    void setInactivityLimit(int seconds) {
+        this.timeInterval = seconds*1000;
+        resetTimer();
     }
 
     private void startTimer() {
