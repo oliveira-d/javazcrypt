@@ -594,7 +594,8 @@ class Main {
         System.out.println();
         System.out.println("(p) change password");
         System.out.println("(k) change key file");
-        System.out.println("(t) change time interval to clear clipboard");
+        System.out.println("(t) change clipboard time limit");
+        System.out.println("(i) change inactivity time limit");
         System.out.println();
         fillWidth("=");
         System.out.printf("Enter an option: ");
@@ -628,11 +629,23 @@ class Main {
                 }
                 break;
             case "t":
-                String timer = inputHandler.editLine("Input time interval (seconds): ",passwordDatabase.getDocumentElement().getAttribute("clipboardTimeLimit"));
+                String clipboardTimeLimitStr = inputHandler.editLine("Enter clipboard time limit (seconds): ",passwordDatabase.getDocumentElement().getAttribute("clipboardTimeLimit"));
                 try {
-                    int milisseconds = Integer.parseInt(timer);
-                    timer = String.valueOf(milisseconds);
-                    passwordDatabase.getDocumentElement().setAttribute("clipboardTimeLimit",timer);
+                    int clipboardTimeLimit = Integer.parseInt(clipboardTimeLimitStr);
+                    clipboardTimeLimitStr = String.valueOf(clipboardTimeLimit);
+                    passwordDatabase.getDocumentElement().setAttribute("clipboardTimeLimit",clipboardTimeLimitStr);
+                    saved = false;
+                    autoSave();
+                } catch (NumberFormatException e) {
+                    message = "Timer was not updated. Input was not a number.";
+                }
+                break;
+            case "i":
+                String inactivityTimeLimitStr = inputHandler.editLine("Enter inactivity time limit (seconds): ",passwordDatabase.getDocumentElement().getAttribute("inactivityTimeLimit"));
+                try {
+                    int inactivityTimeLimit = Integer.parseInt(inactivityTimeLimitStr);
+                    inactivityTimeLimitStr = String.valueOf(inactivityTimeLimit);
+                    passwordDatabase.getDocumentElement().setAttribute("inactivityTimeLimit",inactivityTimeLimitStr);
                     saved = false;
                     autoSave();
                 } catch (NumberFormatException e) {
