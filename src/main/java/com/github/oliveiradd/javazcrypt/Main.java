@@ -101,7 +101,7 @@ class Main {
                 while (inputFile.endsWith(" ")) {
                     // Remove the space using substring to avoid exception - this space may occur when completing with tab
                     inputFile = inputFile.substring(0, inputFile.length() - 1);
-                }                
+                }
             } else { // operation is encrypt or decrypt
                 System.err.println("No input file specified.");
                 System.exit(1);
