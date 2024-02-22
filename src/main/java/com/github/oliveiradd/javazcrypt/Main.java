@@ -98,6 +98,10 @@ class Main {
         if (inputFile == null) {
             if (operation.equals("open")) {
                 inputFile = inputHandler.completeLine("No database specified. Enter the path for an existing database or create a new one: ");
+                while (inputFile.endsWith(" ")) {
+                    // Remove the space using substring to avoid exception - this space may occur when completing with tab
+                    inputFile = inputFile.substring(0, inputFile.length() - 1);
+                }                
             } else { // operation is encrypt or decrypt
                 System.err.println("No input file specified.");
                 System.exit(1);
