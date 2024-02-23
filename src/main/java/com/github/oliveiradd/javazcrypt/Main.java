@@ -418,6 +418,10 @@ class Main {
                         String encodedBytes = fileElement.getTextContent();
                         byte[] decodedBytes = Base64.getDecoder().decode(encodedBytes);
                         String outputDecodedFile = inputHandler.completeLine("Enter file to output data: ");
+                        if (Files.exist(Paths.get(outputDecodedFile))) {
+                            message = "Could not output decoded file: file exists, will not overwrite";
+                            break;
+                        }
                         try{
                             ContentManager.writeBytesToFile(outputDecodedFile,decodedBytes);
                         } catch (IOException e) {
