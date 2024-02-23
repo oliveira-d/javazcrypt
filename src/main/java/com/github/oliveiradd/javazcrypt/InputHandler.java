@@ -71,7 +71,12 @@ class InputHandler {
     
     String completeLine(String prompt) {
         resetTimer();
-        return lineCompleter.readLine(prompt);
+        String text = lineCompleter.readLine(prompt);
+        while (text.endsWith(" ")) {
+            // remove blank spaces in the end of string
+            text = text.substring(0, text.length() - 1);
+        }
+        return text;
     }
 
     String editLine(String prompt, String editable) {

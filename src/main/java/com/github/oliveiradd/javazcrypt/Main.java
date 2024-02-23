@@ -101,10 +101,6 @@ class Main {
         if (inputFile == null) {
             if (operation.equals("open")) {
                 inputFile = inputHandler.completeLine("No database specified. Enter the path for an existing database or create a new one: ");
-                while (inputFile.endsWith(" ")) {
-                    // Remove the space using substring to avoid exception - this space may occur when completing with tab
-                    inputFile = inputFile.substring(0, inputFile.length() - 1);
-                }
             } else { // operation is encrypt or decrypt
                 System.err.println("No input file specified.");
                 System.exit(1);
@@ -378,10 +374,6 @@ class Main {
                     break;
                 case "if":
                     String importedFile = inputHandler.completeLine("Enter the path for the file you wish to import to this database: ");
-                    while (importedFile.endsWith(" ")) {
-                        // Remove the space using substring to avoid exception - this space may occur when completing with tab
-                        importedFile = importedFile.substring(0, importedFile.length() - 1);
-                    }
                     if (!Files.exists(Paths.get(importedFile))) {
                         message = "Cannot import '"+importedFile+"': file does not exist.";
                     } else if (!Files.isReadable(Paths.get(importedFile))) {
@@ -426,10 +418,6 @@ class Main {
                         String encodedBytes = fileElement.getTextContent();
                         byte[] decodedBytes = Base64.getDecoder().decode(encodedBytes);
                         String outputDecodedFile = inputHandler.completeLine("Enter file to output data: ");
-                        while (outputDecodedFile.endsWith(" ")) {
-                            // Remove the space using substring to avoid exception
-                            outputDecodedFile = outputDecodedFile.substring(0, outputDecodedFile.length() - 1);
-                        }
                         try{
                             ContentManager.writeBytesToFile(outputDecodedFile,decodedBytes);
                         } catch (IOException e) {
@@ -621,10 +609,6 @@ class Main {
                 break;
             case "k":
                 String newKeyFile = inputHandler.completeLine("Enter path to new key file: ");
-                while (newKeyFile.endsWith(" ")) {
-                    // Remove the space using substring to avoid exception - this space may occur when completing with tab
-                    newKeyFile = newKeyFile.substring(0, newKeyFile.length() - 1);
-                }
                 if (newKeyFile.equals("")) {
                     if (password.equals("")) {
                         message = "Key file cannot be null when password is empty.";
