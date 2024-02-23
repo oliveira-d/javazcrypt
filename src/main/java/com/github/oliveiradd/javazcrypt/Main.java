@@ -54,6 +54,9 @@ class Main {
     static String message = null;
     private static boolean exitProgram = false;
 
+    // maximum imported file size (in mb)
+    private static long maxFileSize = 30;
+
     public static void main(String[] args) {
 
         String operation = "open";
@@ -388,6 +391,10 @@ class Main {
                     } else {
                         byte[] fileBytes = null; // compiler complains if i don't initialize it
                         try {
+                            if (Files.size(Paths.get(importedFile)) > maxFileSize*1024*1024) {
+                                message = "Cannot import'"+importedFile+"': file is larger the maximum supported size of "+maxFileSize+" MiB";
+                                break;
+                            }
                             fileBytes = Files.readAllBytes(Paths.get(importedFile));
                         } catch (IOException e) {
                             message = "Could not open file "+importedFile;
