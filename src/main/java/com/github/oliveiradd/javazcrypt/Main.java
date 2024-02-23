@@ -652,6 +652,7 @@ class Main {
                     passwordDatabase.getDocumentElement().setAttribute("inactivityTimeLimit",inactivityTimeLimitStr);
                     saved = false;
                     autoSave();
+                    inputHandler.setInactivityLimit(inactivityTimeLimit);
                 } catch (NumberFormatException e) {
                     message = "Timer was not updated. Input was not a number.";
                 }
