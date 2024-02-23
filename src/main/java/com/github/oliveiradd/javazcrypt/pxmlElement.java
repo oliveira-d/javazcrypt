@@ -38,7 +38,7 @@ class pxmlElement {
                     switch (childElement.getAttribute("name")) {
                         case "TOTP":
                             if (childElement.getTextContent().length() > 0) {
-                                String totp = TOTP.getCode(childElement.getTextContent());
+                                String totp = TOTP.getCode(childElement.getTextContent(),childElement.getAttribute("algorithm"),childElement.getAttribute("totpInterval"),childElement.getAttribute("numberOfDigits"));
                                 if (hideSensitiveValues) {
                                     System.out.printf(": ");
                                     for (int j=0; j<totp.length(); j++) {
