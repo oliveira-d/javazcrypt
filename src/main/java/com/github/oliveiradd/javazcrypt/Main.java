@@ -560,6 +560,10 @@ class Main {
                             pxmlElement field = currentElement.getChildElement(index-1);
                             String text = null;
                             if (field.getAttribute("name").equals("TOTP")) {
+                                // set defaults
+                                field.setAttribute("totpInterval","30");
+                                field.setAttribute("algorithm","HmacSHA1");
+                                field.setAttribute("numberOfDigits","6");
                                 text = inputHandler.editLine("Edit "+field.getAttribute("name")+" secret key: ",field.getTextContent());
                             } else {
                                 text = inputHandler.editLine("Edit "+field.getAttribute("name")+": ",field.getTextContent());
@@ -575,7 +579,7 @@ class Main {
                             String text = field.getTextContent();
                             if (field.getAttribute("name").equals("TOTP")) {
                                 if (field.getTextContent().length() > 0) {
-                                    text = TOTP.getCode(field.getTextContent());
+                                    text = TOTP.getCode(field.getTextContent(),field.getAttribute("algorithm"),field.getAttribute("totpInterval"),field.getAttribute("numberOfDigits"));
                                 }
                             }
                             ContentManager.copyToClipboard(text);
