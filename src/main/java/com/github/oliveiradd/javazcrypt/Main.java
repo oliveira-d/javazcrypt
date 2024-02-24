@@ -384,7 +384,7 @@ class Main {
                         byte[] fileBytes = null; // compiler complains if i don't initialize it
                         try {
                             if (Files.size(Paths.get(importedFile)) > maxFileSize*1024*1024) {
-                                message = "Cannot import'"+importedFile+"': file is larger the maximum supported size of "+maxFileSize+" MiB";
+                                message = "Cannot import '"+importedFile+"': file is larger the maximum supported size of "+maxFileSize+" MiB";
                                 break;
                             }
                             fileBytes = Files.readAllBytes(Paths.get(importedFile));
@@ -418,7 +418,7 @@ class Main {
                         String encodedBytes = fileElement.getTextContent();
                         byte[] decodedBytes = Base64.getDecoder().decode(encodedBytes);
                         String outputDecodedFile = inputHandler.completeLine("Enter file to output data: ");
-                        if (Files.exist(Paths.get(outputDecodedFile))) {
+                        if (Files.exists(Paths.get(outputDecodedFile))) {
                             message = "Could not output decoded file: file exists, will not overwrite";
                             break;
                         }
