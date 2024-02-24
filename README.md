@@ -12,10 +12,6 @@ gradlew.bat build
 ```
 Note: on Windows you need to set the %JAVA_HOME% environment variable. To find what the %JAVA_HOME% should be, With JDK installed, execute the command "where javac". The output will be %JAVA_HOME%\bin\javac.exe
 
-Alternatively, you can build it with Maven. With Maven installed, execute the following command:
-```
-mvn package
-```
 ```
 Usage:
 
