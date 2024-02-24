@@ -482,8 +482,8 @@ class Main {
             items = currentElement.displayChildElements(true,hideSensitiveValues);
             System.out.println();
             fillWidth("=");
-            String[] options0 = {" number - select field "," g - generate password "," w - write to file "};
-            String[] options1 = {" 0 or .. - close entry "," v - toggle visibility ","     q - quit      "};
+            String[] options0 = {" number - select field "," g - generate password "," v - toggle visibility "};
+            String[] options1 = {" 0 or .. - close entry ","    s - setup TOTP     ","       q - quit        "};
             if (currentElement.getTagName().equals("card")) {
                 options0[1] = "";
                 options1[1] = ""; // case of card = no password
