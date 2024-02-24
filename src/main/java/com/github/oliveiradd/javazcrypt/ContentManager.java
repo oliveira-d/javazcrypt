@@ -32,6 +32,7 @@ class ContentManager {
 
     private static String[] entryFields = {"user","password","URL","TOTP","notes"};
     static int passwordIndex = 1;
+    static int TOTPIndex = 3;
 
     static void writeBytesToFile(String outputFile, byte[] outputBytes) throws IOException {
         try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {

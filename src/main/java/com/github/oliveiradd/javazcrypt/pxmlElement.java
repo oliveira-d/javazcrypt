@@ -10,6 +10,10 @@ class pxmlElement {
 
     private Element element;
     private static String[] entryFields = {"user","password","URL","TOTP","notes"};
+    static int passwordIndex = 1;
+    static int TOTPIndex = 3;
+    private static String[] cardFields = {"number","name","expiration","cvv"};
+
     // private static Document passwordDatabase; 
 
     pxmlElement(Document passwordDatabase) {
@@ -86,10 +90,10 @@ class pxmlElement {
         String[] childFields = null;
         switch (childType) {
             case "entry":
-                childFields = new String[]{"user","password","URL","TOTP","notes"};
+                childFields = entryFields;
                 break;
             case "card":
-                childFields = new String[]{"number","name","expiration","cvv"};
+                childFields = cardFields;
                 break;
         }
         Element child = passwordDatabase.createElement(childType);

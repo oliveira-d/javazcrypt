@@ -536,13 +536,17 @@ class Main {
                         int length = Integer.parseInt(input);
                         String entryPassword = generatePassword(length,chosenPasswordsElements);
                         Text textNode = passwordDatabase.createTextNode(entryPassword);
-                        currentElement.getChildElement(ContentManager.passwordIndex).deleteTextContent(); // passwordEntry = 1
-                        currentElement.getChildElement(ContentManager.passwordIndex).appendChild(textNode);
+                        currentElement.getChildElement(pxmlElement.passwordIndex).deleteTextContent(); // passwordEntry = 1
+                        currentElement.getChildElement(pxmlElement.passwordIndex).appendChild(textNode);
                         saved = false;
                         autoSave();
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
+                    break;
+                case "t":
+                    pxmlElement totpField = currentElement.getChildElement(pxmlElement.TOTPIndex);
+                    setupTOTP(totpField);
                     break;
                 case "q":
                     exitProgram = true;
@@ -594,6 +598,41 @@ class Main {
             clearScreen();
         } while (!exitProgram);
         return null;
+    }
+
+    private static void setupTOTP(pxmlElement totpField) {
+        String algorithm;
+        do {
+            algorithm = inputHandler.editLine("Enter algorithm (HmacSHA1, HmacSHA256, HmacSHA512): ",totpField.getAttribute("algorithm"));
+            if (!algorithm.equals("HmacSHA1") && !algorithm.equals("HmacSHA256") && !algorithm.equals("HmacSHA512")) System.err.println("Invalid algorithm. Note that the input is case sensitive.");
+        } while (!algorithm.equals("HmacSHA1") && !algorithm.equals("HmacSHA256") && !algorithm.equals("HmacSHA512"));
+        totpField.setAttribute("algorithm",algorithm);
+        // set time interval
+        String totpIntervalStr;
+        int totpInterval = 0;
+        do {
+            totpIntervalStr = inputHandler.editLine("Enter TOTP time interval (seconds): ",totpField.getAttribute("totpInterval"));
+            try {
+                totpInterval = Integer.parseInt(totpIntervalStr);
+                if (totpInterval == 0) System.err.println("Interval cannot be zero.");
+            } catch (NumberFormatException e) {
+                System.err.println("Not a integer number. Try again.");
+            }
+        } while (totpInterval == 0);
+        totpField.setAttribute("totpInterval",totpIntervalStr);
+        //set number of digits
+        String numberOfDigitsStr;
+        int numberOfDigits = 0;
+        do {
+            numberOfDigitsStr = inputHandler.editLine("Enter TOTP number of digits: ",totpField.getAttribute("numberOfDigits"));
+            try {
+                numberOfDigits = Integer.parseInt(numberOfDigitsStr);
+                if (numberOfDigits == 0) System.err.println("Number of digits cannot be zero.");
+            } catch (NumberFormatException e) {
+                System.err.println("Not a integer number. Try again.");
+            }
+        } while (numberOfDigits == 0);
+        totpField.setAttribute("numberOfDigits",numberOfDigitsStr);
     }
 
     private static void settingsMenu() {
