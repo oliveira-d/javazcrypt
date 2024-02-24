@@ -699,6 +699,7 @@ class Main {
     }
 
     static void saveFile() {
+        if (saved == true) return;
         try {
             byte[] decryptedBytes = ContentManager.convertXMLDocumentToByteArray(passwordDatabase);
             byte[] encryptedBytes = CryptOps.encryptBytes(decryptedBytes,password,keyFile);
