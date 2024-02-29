@@ -28,11 +28,20 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 
+// lock file while writting to it
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+
 class ContentManager {
 
     static void writeBytesToFile(String outputFile, byte[] outputBytes) throws IOException {
-        try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
-            outputStream.write(outputBytes);
+        try (FileOutputStream outputStream = new FileOutputStream(outputFile);
+        FileChannel channel = outputStream.getChannel()) {
+
+            FileLock lock = channel.lock();
+            // outputStream.write(outputBytes);
+            channel.write(java.nio.ByteBuffer.wrap(outputBytes));
+            lock.release();
         }
     }
     //methods to manage XML file in memory
