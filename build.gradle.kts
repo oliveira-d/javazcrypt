@@ -20,7 +20,7 @@ dependencies {
 }
 
 group = "com.github.oliveiradd.javazcrypt"
-version = "1.1.0"
+version = "1.1.1"
 description = "javazcrypt"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
