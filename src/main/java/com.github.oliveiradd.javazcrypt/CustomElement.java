@@ -8,7 +8,7 @@ import org.w3c.dom.NodeList;
 
 import java.lang.Integer;
 
-class pxmlElement {
+class CustomElement {
 
     private Element element;
     private static String[] entryFields = {"user","password","URL","TOTP","notes"};
@@ -18,11 +18,11 @@ class pxmlElement {
 
     // private static Document passwordDatabase; 
 
-    pxmlElement(Document passwordDatabase) {
+    CustomElement(Document passwordDatabase) {
         this.element = passwordDatabase.getDocumentElement();
     }
 
-    pxmlElement(Element element) {
+    CustomElement(Element element) {
         this.element = element;
     }
 
@@ -77,17 +77,17 @@ class pxmlElement {
         return childNodes.getLength();
     }
     
-    pxmlElement getChildElement(int index) {
+    CustomElement getChildElement(int index) {
         Element folder = this.element;
             // System.out.println("Child elements of " + parentElement.getTagName() + ":");
         NodeList childNodes = folder.getChildNodes();
         Node node = childNodes.item(index);
         Element childElement = null;
         if (node.getNodeType() == Node.ELEMENT_NODE) childElement = (Element) node;
-        return new pxmlElement(childElement);
+        return new CustomElement(childElement);
     }
 
-    pxmlElement createChild(Document passwordDatabase, String childType, String childName) {
+    CustomElement createChild(Document passwordDatabase, String childType, String childName) {
         Element folder = this.element;
         String[] childFields = null;
         switch (childType) {
@@ -144,7 +144,7 @@ class pxmlElement {
                 child.appendChild(newField);
             }
         }
-        return new pxmlElement(child);
+        return new CustomElement(child);
     }
 
     void deleteItem(int index) {
@@ -194,7 +194,7 @@ class pxmlElement {
         this.element.appendChild(textNode);
     }
 
-    void appendChild(pxmlElement childElement) {
+    void appendChild(CustomElement childElement) {
         this.element.appendChild(childElement.element);
     }
 

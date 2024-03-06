@@ -91,7 +91,7 @@ class ContentManager {
         return null;
     }
 
-    static void outputEncodedFile(pxmlElement currentElement,String outputFile) {
+    static void outputEncodedFile(CustomElement currentElement,String outputFile) {
         String encodedFile = currentElement.getTextContent();
         byte[] decodedData = Base64.getDecoder().decode(encodedFile);
         try {

@@ -41,7 +41,7 @@ class Main {
     private static String inputFile = null;
     private static String outputFile = null;
     private static Terminal terminal = getTerminal();
-    private static pxmlElement clipboardElement = null; // leave it to the class so that is doesn't lose itself when switching between mainMenu() and secondaryMenu()
+    private static CustomElement clipboardElement = null; // leave it to the class so that is doesn't lose itself when switching between mainMenu() and secondaryMenu()
     private static boolean saved = true;
     private static Document passwordDatabase = null;
 
@@ -175,7 +175,7 @@ class Main {
 
         if (passwordDatabase == null) System.exit(1);
 
-        pxmlElement currentElement = new pxmlElement(passwordDatabase);
+        CustomElement currentElement = new CustomElement(passwordDatabase);
 
         clearScreen();
         timer = new Timer(); // timer is only initialized here to avoid the program hanging instead of finishing execution after operations executed previously in the code 
@@ -241,11 +241,11 @@ class Main {
         }
     }
 
-    private static pxmlElement mainMenu(pxmlElement currentElement) {
+    private static CustomElement mainMenu(CustomElement currentElement) {
         String input = null;
         int items;
         int index;
-        pxmlElement fileElement = null;
+        CustomElement fileElement = null;
         do {
             if (message != null) {
                 System.out.println(message);
@@ -330,7 +330,7 @@ class Main {
                         Node parentNode = currentElement.getParentNode();
                         if (parentNode != null && parentNode.getNodeType() == Node.ELEMENT_NODE) {
                             Element tempElement = (Element) parentNode;
-                            currentElement = new pxmlElement(tempElement);
+                            currentElement = new CustomElement(tempElement);
                             pathQ.pop();
                         }
                     }
@@ -450,7 +450,7 @@ class Main {
         return null;
     }
 
-    private static pxmlElement secondaryMenu(pxmlElement currentElement) {
+    private static CustomElement secondaryMenu(CustomElement currentElement) {
         String input = null;
         int items;
         int index;
@@ -510,7 +510,7 @@ class Main {
                     Node parentNode = currentElement.getParentNode();
                     if (parentNode != null && parentNode.getNodeType() == Node.ELEMENT_NODE) {
                         Element tempElement = (Element) parentNode;
-                        currentElement = new pxmlElement(tempElement);
+                        currentElement = new CustomElement(tempElement);
                         pathQ.pop();
                         clearScreen(); // needed here while not in the mainMenu because of return statement below
                         return currentElement;
@@ -536,8 +536,8 @@ class Main {
                         int length = Integer.parseInt(input);
                         String entryPassword = generatePassword(length,chosenPasswordsElements);
                         Text textNode = passwordDatabase.createTextNode(entryPassword);
-                        currentElement.getChildElement(pxmlElement.passwordIndex).deleteTextContent(); // passwordEntry = 1
-                        currentElement.getChildElement(pxmlElement.passwordIndex).appendChild(textNode);
+                        currentElement.getChildElement(CustomElement.passwordIndex).deleteTextContent(); // passwordEntry = 1
+                        currentElement.getChildElement(CustomElement.passwordIndex).appendChild(textNode);
                         saved = false;
                         autoSave();
                     } catch (NumberFormatException e) {
@@ -545,7 +545,7 @@ class Main {
                     }
                     break;
                 case "t":
-                    pxmlElement totpField = currentElement.getChildElement(pxmlElement.TOTPIndex);
+                    CustomElement totpField = currentElement.getChildElement(CustomElement.TOTPIndex);
                     setupTOTP(totpField);
                     break;
                 case "q":
@@ -560,7 +560,7 @@ class Main {
                     }
                     if (index <= items && index >= 1) {
                         if (mode.equals("edit")) {
-                            pxmlElement field = currentElement.getChildElement(index-1);
+                            CustomElement field = currentElement.getChildElement(index-1);
                             String text = null;
                             if (field.getAttribute("name").equals("TOTP")) {
                                 // set defaults
@@ -578,7 +578,7 @@ class Main {
                             saved = false;
                             autoSave();
                         } else {
-                            pxmlElement field = currentElement.getChildElement(index-1);
+                            CustomElement field = currentElement.getChildElement(index-1);
                             String text = field.getTextContent();
                             if (field.getAttribute("name").equals("TOTP")) {
                                 if (field.getTextContent().length() > 0) {
@@ -600,7 +600,7 @@ class Main {
         return null;
     }
 
-    private static void setupTOTP(pxmlElement totpField) {
+    private static void setupTOTP(CustomElement totpField) {
         String algorithm;
         do {
             algorithm = inputHandler.editLine("Enter algorithm (HmacSHA1, HmacSHA256, HmacSHA512): ",totpField.getAttribute("algorithm"));
