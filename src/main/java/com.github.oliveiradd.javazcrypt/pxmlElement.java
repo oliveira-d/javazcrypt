@@ -123,7 +123,7 @@ class pxmlElement {
             if (element2 != null) tagComparison2 = childType.compareTo(element2.getTagName());
 
             if (nameComparison >= 0 && tagComparison >= 0) {
-                if (nameComparison2 == null && tagComparison2 == null) {
+                if (nameComparison2 == null) {
                     folder.appendChild(child);
                     break;
                 } else if (nameComparison2 < 0 && tagComparison2 < 0) {
