@@ -6,6 +6,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 import org.w3c.dom.NodeList;
 
+import java.lang.Integer;
+
 class pxmlElement {
 
     private Element element;
@@ -98,9 +100,42 @@ class pxmlElement {
         }
         Element child = passwordDatabase.createElement(childType);
         child.setAttribute("name",childName);
-        folder.appendChild(child);
+
+        // append by alphabetical order
+        NodeList childNodes = folder.getChildNodes();
+
+        if (childNodes.getLength() == 0) folder.appendChild(child);
+        int i=0;
+        while (i<childNodes.getLength()) {
+
+            Node node = childNodes.item(i);
+            Node node2 = childNodes.item(++i);
+
+            Element element = (Element) node;
+            Element element2 = (Element) node2;
+
+            int comparison = childName.compareTo(element.getAttribute("name"));
+            Integer comparison2 = null; // if element is the last element
+            if (element2 != null) comparison2 = childName.compareTo(element2.getAttribute("name"));
+
+            if (comparison >= 0) {
+                if (comparison2 == null) {
+                    folder.appendChild(child);
+                    break;
+                } else if (comparison2 < 0) {
+                    folder.insertBefore(child,node2);
+                    break;
+                }
+            } else {
+                folder.insertBefore(child,node);
+                break;
+            }
+        }
+
+        // create fields in child if needed
+
         if (childFields != null) {
-            for (int i=0; i<childFields.length; i++) {
+            for (i=0; i<childFields.length; i++) {
                 Element newField = passwordDatabase.createElement("field");
                 newField.setAttribute("name",childFields[i]);
                 child.appendChild(newField);
