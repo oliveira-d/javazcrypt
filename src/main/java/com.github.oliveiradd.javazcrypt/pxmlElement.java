@@ -122,15 +122,14 @@ class pxmlElement {
             Integer tagComparison2 = null;
             if (element2 != null) tagComparison2 = childType.compareTo(element2.getTagName());
 
-            if (nameComparison >= 0 && tagComparison >= 0) {
-                if (nameComparison2 == null) {
+            if (nameComparison >= 0 && tagComparison >= 0) { // if(1) name and tag equal or after node:
+                if (nameComparison2 == null) { // if(2) node is last element, append
                     folder.appendChild(child);
-                    break;
-                } else if (nameComparison2 < 0 && tagComparison2 < 0) {
+                } else if (tagComparison2 < 0) { // else if(2) tag before node2 (name will be after node because of condition above)
                     folder.insertBefore(child,node2);
-                    break;
                 }
-            } else if (tagComparison <= 0) {
+                break;
+            } else if (tagComparison <= 0) { // else if(1) tag before or equal node, name doesn't matter, just put it before
                 folder.insertBefore(child,node);
                 break;
             }
