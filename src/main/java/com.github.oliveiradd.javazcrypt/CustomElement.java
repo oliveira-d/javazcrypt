@@ -125,23 +125,22 @@ class CustomElement {
             if (tagComparison < 0) {
                 folder.insertBefore(child,node);
                 break;
-            } else {
-                if (tagComparison2 == null) {
-                    if (nameComparison < 0){
-                        folder.insertBefore(child,node);
-                    } else {
-                        folder.appendChild(child);
-                    }
-                    break;
-                } else if (tagComparison2 < 0) {
-                    folder.insertBefore(child,node2);
-                    break;
-                } else { // if tagComparison2 >= 0
-                    if (tagComparison2 == 0 && nameComparison2 < 0) {
-                        folder.insertBefore(child,node2);
-                        break;
-                    }
+            } else if (tagComparison == 0 && nameComparison < 0 ){
+                folder.insertBefore(child,node);
+                break;
+            } else if (tagComparison2 == null) {
+                if (nameComparison < 0){
+                    folder.insertBefore(child,node);
+                } else {
+                    folder.appendChild(child);
                 }
+                break;
+            } else if (tagComparison2 < 0) {
+                folder.insertBefore(child,node2);
+                break;
+            } else if (tagComparison2 == 0 && nameComparison2 < 0) {
+                folder.insertBefore(child,node2);
+                break;
             }
         }
 
