@@ -6,8 +6,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 import org.w3c.dom.NodeList;
 
-import java.lang.Integer;
-
 class CustomElement {
 
     private Element element;
