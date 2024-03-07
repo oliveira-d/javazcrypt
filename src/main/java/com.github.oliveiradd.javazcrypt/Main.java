@@ -347,6 +347,7 @@ class Main {
                         System.out.printf("Enter new name: ");
                         String name = inputHandler.nextLine();
                         currentElement.getChildElement(index-1).setAttribute("name",name);
+                        currentElement.insertElement(currentElement.getChildElement(index-1).getElement()); // this is done to move it and keep alphabetical order
                         saved = false;
                         autoSave();
                     }
@@ -366,7 +367,7 @@ class Main {
                         }
                         if (index <= items && index >= 1) clipboardElement = currentElement.getChildElement(index-1);
                     } else {
-                        currentElement.appendChild(clipboardElement);
+                        currentElement.insertElement(clipboardElement.getElement());
                         clipboardElement = null;
                         saved = false;
                         autoSave();

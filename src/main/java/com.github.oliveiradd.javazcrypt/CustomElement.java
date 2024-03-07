@@ -102,7 +102,29 @@ class CustomElement {
         child.setAttribute("name",childName);
 
         // append by alphabetical order
+        CustomElement customFolder = new CustomElement(folder);
+        customFolder.insertElement(child);
+
+        // create fields in child if needed
+
+        if (childFields != null) {
+            for (int i=0; i<childFields.length; i++) {
+                Element newField = passwordDatabase.createElement("field");
+                newField.setAttribute("name",childFields[i]);
+                child.appendChild(newField);
+            }
+        }
+        return new CustomElement(child);
+    }
+
+    void insertElement(Element child) {
+
+        Element folder = this.element;
+
         NodeList childNodes = folder.getChildNodes();
+
+        String childType = child.getTagName();
+        String childName = child.getAttribute("name");
 
         if (childNodes.getLength() == 0) folder.appendChild(child);
         int i=0;
@@ -144,16 +166,6 @@ class CustomElement {
             }
         }
 
-        // create fields in child if needed
-
-        if (childFields != null) {
-            for (i=0; i<childFields.length; i++) {
-                Element newField = passwordDatabase.createElement("field");
-                newField.setAttribute("name",childFields[i]);
-                child.appendChild(newField);
-            }
-        }
-        return new CustomElement(child);
     }
 
     void deleteItem(int index) {
