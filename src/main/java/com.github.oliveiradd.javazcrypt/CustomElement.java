@@ -134,34 +134,15 @@ class CustomElement {
             Node node2 = childNodes.item(++i);
 
             Element element = (Element) node;
-            Element element2 = (Element) node2;
 
             int nameComparison = childName.compareTo(element.getAttribute("name"));
-            Integer nameComparison2 = null; // if element is the last element
-            if (element2 != null) nameComparison2 = childName.compareTo(element2.getAttribute("name"));
-
             int tagComparison = childType.compareTo(element.getTagName());
-            Integer tagComparison2 = null;
-            if (element2 != null) tagComparison2 = childType.compareTo(element2.getTagName());
 
-            if (tagComparison < 0) {
+            if (tagComparison < 0 || (tagComparison == 0 && nameComparison < 0)) {
                 folder.insertBefore(child,node);
                 break;
-            } else if (tagComparison == 0 && nameComparison < 0 ){
-                folder.insertBefore(child,node);
-                break;
-            } else if (tagComparison2 == null) {
-                if (nameComparison < 0){
-                    folder.insertBefore(child,node);
-                } else {
-                    folder.appendChild(child);
-                }
-                break;
-            } else if (tagComparison2 < 0) {
-                folder.insertBefore(child,node2);
-                break;
-            } else if (tagComparison2 == 0 && nameComparison2 < 0) {
-                folder.insertBefore(child,node2);
+            } else if (node2 == null) {
+                folder.appendChild(child);
                 break;
             }
         }
