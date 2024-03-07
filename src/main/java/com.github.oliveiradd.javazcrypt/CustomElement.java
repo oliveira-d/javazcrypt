@@ -115,6 +115,12 @@ class CustomElement {
         return new CustomElement(child);
     }
 
+    void insertElement(CustomElement customChild) {
+        Element child = customChild.getElement();
+        CustomElement folder = this;
+        folder.insertElement(child);
+    }
+
     void insertElement(Element child) {
 
         Element folder = this.element;
