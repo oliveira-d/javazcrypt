@@ -31,13 +31,14 @@ class CustomElement {
         // System.out.println("Child elements of " + parentElement.getTagName() + ":");
         Element folder = this.element;
         NodeList childNodes = folder.getChildNodes();
+        int indexSpacing = String.valueOf(childNodes.getLength()).length(); // gets the number of digits of the number to that is can determined the spacing for index
 
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node node = childNodes.item(i);
 
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element childElement = (Element) node;
-                System.out.printf("(%-"+7+"s (%d) %s",childElement.getTagName()+")",i+1,childElement.getAttribute("name"));
+                System.out.printf("(%-"+7+"s (%"+indexSpacing+"d) %s",childElement.getTagName()+")",i+1,childElement.getAttribute("name"));
                 if (showValue) {
                     switch (childElement.getAttribute("name")) {
                         case "TOTP":
