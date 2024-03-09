@@ -344,8 +344,7 @@ class Main {
                         e.printStackTrace();
                     }
                     if (index <= items && index >= 1) {
-                        System.out.printf("Enter new name: ");
-                        String name = inputHandler.nextLine();
+                        String name = inputHandler.editLine("Enter new name: ",currentElement.getChildElement(index-1).getAttribute("name"));
                         currentElement.getChildElement(index-1).setAttribute("name",name);
                         currentElement.insertElement(currentElement.getChildElement(index-1)); // this is done to move it and keep alphabetical order
                         saved = false;
