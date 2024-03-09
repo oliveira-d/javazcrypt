@@ -140,8 +140,8 @@ class CustomElement {
 
             Element element = (Element) node;
 
-            int nameComparison = childName.compareTo(element.getAttribute("name"));
-            int tagComparison = childType.compareTo(element.getTagName());
+            int nameComparison = childName.toLowerCase().compareTo(element.getAttribute("name").toLowerCase());
+            int tagComparison = childType.toLowerCase().compareTo(element.getTagName().toLowerCase());
 
             if (tagComparison < 0 || (tagComparison == 0 && nameComparison < 0)) {
                 folder.insertBefore(child,node);
